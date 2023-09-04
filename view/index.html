@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <title>Sign-Spine</title>
+    <link href="assets/bootstrap/bootstrap.min.css" rel="stylesheet">
+
+  </head>
+  <body>
+      <header class="p-3 text-bg-light">
+        <div class="container">
+          <div class="d-flex flex-wrap align-items-center justify-content-between justify-content-lg-start">
+            <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+              <img class="bi me-2" src="assets/images/sflex_logo.svg" width="150" height="64" alt="Sflex logo">
+            </a>
+
+            <ul class="nav text-end">
+              <li><a href="#" class="nav-link px-2 text-dark d-none" id="logoutBtn">Logout</a></li>
+            </ul>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main class="pt-5" id="content"></main>
+
+      <script src="assets/ui/main.js"/>
+      <script src="assets/bootstrap/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
