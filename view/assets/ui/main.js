@@ -8,6 +8,7 @@ let session = null;
 (async () => {
     const bodyHtmlLoad = document.getElementById('content');
     const logoutBtnLoad = document.getElementById('logoutBtn');
+    const exitBtnLoad = document.getElementById('exitBtn');
 
     const readyBodyLoad = await (await fetch('ready.html')).text();
     const loginBodyLoad = await (await fetch('login.html')).text();
@@ -15,6 +16,7 @@ let session = null;
     
     const init = () => {
         bodyHtmlLoad.innerHTML = readyBodyLoad;
+        window.electronAPI.loginStatus();
         
         bodyHtml = bodyHtmlLoad;
         logoutBtn = logoutBtnLoad;
@@ -27,10 +29,19 @@ let session = null;
             denyLogin();
             bodyHtml.innerHTML = readyBody;
         });
+
+        exitBtnLoad.addEventListener('click', () => {
+            window.electronAPI.exit();
+        });
     }
     
     init();
 })();
+
+window.electronAPI.onLoginStatus((event, loginObject) => {
+    session = loginObject;
+    confirmLogin();
+});
 
 window.electronAPI.onLogin((event, loginObject) => {    
     bodyHtml.innerHTML = loginBody;

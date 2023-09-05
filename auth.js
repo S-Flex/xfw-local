@@ -42,7 +42,7 @@ class authenticator {
         }
     }
 
-    static async login(token) {
+    static async login(url, token) {
 
         const checkToken = await fetch('https://xfw-hub.sflex.nl/api/OauthV2/info', {
             method: 'GET',
@@ -58,11 +58,13 @@ class authenticator {
             const sessionObject = await checkToken.json();
 
             this.sessionObject = sessionObject;
+            this.url = url;
 
             return true;
 
         } else {
             this.localToken = null;
+            this.url = null;
 
             return new Error('Invalid token');
         }
