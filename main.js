@@ -1,6 +1,6 @@
 'use strict';
 
-const { readdir, readFile } = require('fs/promises');
+const { readdir, readFile, copyFile, rename, unlink, mkdir } = require('fs/promises');
 
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
@@ -64,54 +64,159 @@ const createWindow = () => {
             return;
         }
 
-        res.send('ok')
-    });
+        ipcMain.once('confirm-login', () => {
+            auth.confirmLogin();
 
-    server.post('/ls', auth.auth, async (req, res) => {
-        const directory = req.body.path;
-
-        const result = await readdir(directory, { withFileTypes: true, recursive: true });
-
-        // Add is directory attribute
-        result.map((item) => {
-            item.isFile = item.isFile()
+            if(!res.headersSent)
+                res.send('ok');
         });
 
-        res.json(result);
+        ipcMain.once('deny-login', () => {
+            auth.denyLogin();
+
+            if(!res.headersSent)
+                res.status(403).send('not ok')
+        });
     });
 
-    // Returns file in base64
-    server.post('/getFile', auth.auth, async (req, res) => {
+    // This request lists all files and directories in a directory
+    server.post('/ls', auth.auth, (req, res) => {
+        const directory = req.body.path;
+
+        if(!directory) {
+            res.status(400).send('Path not provided.')
+            return;
+        }
+
+        readdir(directory, { withFileTypes: true, recursive: true }).then((result) => {
+            // Add is directory attribute
+            result.map((item) => {
+                item.isFile = item.isFile()
+            });
+    
+            res.json(result);
+        }).catch(() => {
+            res.status(404).send('Directory does not exist.')
+        });
+
+    });
+
+    // This request returns a file from path in base64
+    server.post('/getFile', auth.auth, (req, res) => {
         const path = req.body.path;
 
-        const result = await readFile(path);
+        if(!path) {
+            res.status(400).send('Path not provided.')
+            return;
+        }
 
-        console.log(result)
+        readFile(path).then(result => {
+            res.send({
+                "fileName": path.substr(path.lastIndexOf('/')+1),
+                "fileBase64": result.toString('base64')
+            })
+        }).catch(() => {
+            res.status(404).send('File does not exist.')
+        });
+    });
 
-        res.send({
-            "fileName": path.substr(path.lastIndexOf('/')+1),
-            "fileBase64": result.toString('base64')
+    // This requests is used to rename a file and/or location.
+    server.post('/moveFile', auth.auth, (req, res) => {
+        const filePath = req.body.path;
+        const newLocation = req.body.newLocation;
+
+        if(!filePath || !newLocation) {
+            res.status(400).send('Path and/or new location not provided.')
+            return;
+        }
+
+        rename(filePath, newLocation).then(() => {
+            res.send('ok')
+        }).catch(() => {
+            res.status(400).send('File does not exist. Nothing to rename.')
         })
     });
 
-    server.post('/moveFile', auth.auth, async (req, res) => {});
-    server.post('/deleteFile', auth.auth, async (req, res) => {});
-    server.post('/downloadFile', auth.auth, async (req, res) => {});
-    server.post('/createFolder', auth.auth, async (req, res) => {});
-    server.post('/deleteFolder', auth.auth, async (req, res) => {});
+    // This request is used to duplicate files.
+    server.post('/copyFile', auth.auth, (req, res) => {
+        const filePath = req.body.path;
+        const newLocation = req.body.newFile;
+
+        if(!filePath || !newLocation) {
+            res.status(400).send('Path and/or new file name not provided.')
+            return;
+        }
+
+        copyFile(filePath, newLocation).then(() => {
+            res.send('ok')
+        }).catch(() => {
+            res.status(404).send('File does not exist. No file to copy.');
+        })
+
+    });
+
+    // This request is used to unload(delete) a file from the local file system.
+    server.post('/deleteFile', auth.auth, (req, res) => {
+        const path = req.body.path;
+
+        if(!path) {
+            res.status(400).send('Path not provided.')
+            return;
+        }
+
+        unlink(path).then(() => {
+            res.send('ok')
+        }).catch(() => {
+            res.status(404).send('File does not exist. Nothing to delete.')
+        });
+    });
+
+    // TODO create uploadFile method
+    // This method is used to upload a file to the local file system
+    server.post('/downloadFile', auth.auth, (req, res) => {
+
+    });
+
+    // This method is used to create a directory at a specific path
+    server.post('/createFolder', auth.auth, (req, res) => {
+        const rootPath = req.body.rootPath;
+        const newDirName = req.body.newDirName;
+
+        if(!rootPath || !newDirName) {
+            res.status(400).send('Root path and/or new directory name not provided.')
+            return;
+        }
+
+        mkdir(rootPath + '/' + newDirName).then(() => {
+            res.send('ok')
+        }).catch(() => {
+            res.status(404).send('Root path does not exist.')
+        });
+    });
+
+    // This method is used to delete a directory and optionally all files in it recursively
+    server.post('/deleteFolder', auth.auth, async (req, res) => {
+        const path = req.body.path;
+        const recursive = req.body.recursive;
+
+        if(!path) {
+            res.status(400).send('Path not provided.')
+            return;
+        }
+
+        try {
+            if(recursive) {
+                await deleteFolderRecursive(path);
+            } else {
+                await unlink(path);
+            }
+            res.send('ok')
+        } catch(e) {
+            res.status(404).send('Directory does not exist.')
+        }
+    });
 
 };
-
-
-
-ipcMain.on('confirm-login', () => {
-    auth.confirmLogin();
-});
-
-ipcMain.on('deny-login', () => {
-    auth.denyLogin();
-});
-
 
 app.whenReady().then(() => {
     createWindow();
