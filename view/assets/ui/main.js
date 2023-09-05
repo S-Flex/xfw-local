@@ -1,4 +1,5 @@
 let bodyHtml = null;
+let logoutBtn = null;
 let readyBody = '';
 let loginBody = '';
 let activeBody = '';
@@ -6,6 +7,7 @@ let session = null;
 
 (async () => {
     const bodyHtmlLoad = document.getElementById('content');
+    const logoutBtnLoad = document.getElementById('logoutBtn');
 
     const readyBodyLoad = await (await fetch('ready.html')).text();
     const loginBodyLoad = await (await fetch('login.html')).text();
@@ -15,10 +17,16 @@ let session = null;
         bodyHtmlLoad.innerHTML = readyBodyLoad;
         
         bodyHtml = bodyHtmlLoad;
+        logoutBtn = logoutBtnLoad;
 
         readyBody = readyBodyLoad;
         loginBody = loginBodyLoad;
         activeBody = activeBodyLoad;
+
+        logoutBtn.addEventListener('click', () => {
+            denyLogin();
+            bodyHtml.innerHTML = readyBody;
+        });
     }
     
     init();
@@ -58,16 +66,17 @@ const confirmLogin = () => {
 
     window.electronAPI.confirmLogin();
     
-    const logOutBtn = document.getElementById('logout');
-    
-    logOutBtn.addEventListener('click', () => {
-        denyLogin();
-        bodyHtml.innerHTML = readyBody;
-    });
+    if(logoutBtn.classList.contains('d-none')) {
+        logoutBtn.classList.remove('d-none');
+    }
 }
 
 const denyLogin = () => {
     bodyHtml.innerHTML = readyBody;
 
     window.electronAPI.denyLogin();
+
+    if(!logoutBtn.classList.contains('d-none')) {
+        logoutBtn.classList.add('d-none');
+    }
 }
