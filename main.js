@@ -38,6 +38,7 @@ const createWindow = async () => {
     }
 
     const window = new BrowserWindow({
+        icon: './icon/sflex_logo.png',
         height: 600,
         width: 400,
         resizable: false,
@@ -52,6 +53,12 @@ const createWindow = async () => {
     win = window;
 
     logs.setWindow(window);
+
+    app.dock.show();
+
+    win.once("closed", () => {
+        app.dock.hide();
+    });
 };
 
 app.whenReady().then(() => {
