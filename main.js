@@ -1,6 +1,6 @@
 'use strict';
 
-const { readdir, readFile, copyFile, rename, unlink, mkdir } = require('fs/promises');
+const { readdir, readFile, copyFile, rename, unlink, mkdir, writeFile, rmdir } = require('fs/promises');
 
 const { app, BrowserWindow, ipcMain, Tray, nativeImage } = require("electron");
 const path = require("path");
@@ -53,7 +53,19 @@ const createWindow = async () => {
     win = window;
 };
 
+ipcMain.on('login-status', () => {
+    if(auth.confirmed) {
+        win.webContents.send('login-status', { url: auth.url, sessionObject: auth.sessionObject })
+    }
+})
+
+// Setup Express routes
 server.get("/auth", async (req, res) => {
+    if(auth.confirmed) {
+        res.status(409).send('App already logged in to a session. Please log out first if you want to log in to a new session.');
+        return;
+    }
+
     // get http param url
     const url = req.query.url;
     const token = req.query.token;
@@ -84,12 +96,6 @@ server.get("/auth", async (req, res) => {
             res.status(403).send('not ok')
     });
 });
-
-ipcMain.on('login-status', () => {
-    if(auth.confirmed) {
-        win.webContents.send('login-status', { url: auth.url, sessionObject: auth.sessionObject })
-    }
-})
 
 // This request lists all files and directories in a directory --tested
 server.post('/ls', auth.auth, (req, res) => {
@@ -183,13 +189,25 @@ server.post('/deleteFile', auth.auth, (req, res) => {
     });
 });
 
-// TODO create uploadFile method
+// TODO test
 // This method is used to upload a file to the local file system
 server.post('/downloadFile', auth.auth, (req, res) => {
+    const fileBase64 = req.body.fileBase64;
+    const path = req.body.path;
+    const fileName = req.body.fileName;
 
+    if(!fileBase64 || !path || !fileName) {
+        res.status(400).send('FileBase64 string, path and/or file name not provided.')
+        return;
+    }
+
+    writeFile(path + '/' + fileName, fileBase64, 'base64').then(() => {
+        res.send('ok')
+    }).catch(() => {
+        res.status(403).send('Root path does not exist or no permission to write file.')
+    });
 });
 
-// TODO test
 // This method is used to create a directory at a specific path
 server.post('/createFolder', auth.auth, (req, res) => {
     const rootPath = req.body.rootPath;
@@ -207,7 +225,6 @@ server.post('/createFolder', auth.auth, (req, res) => {
     });
 });
 
-// TODO test
 // This method is used to delete a directory and optionally all files in it recursively
 server.post('/deleteFolder', auth.auth, async (req, res) => {
     const path = req.body.path;
@@ -219,14 +236,14 @@ server.post('/deleteFolder', auth.auth, async (req, res) => {
     }
 
     try {
-        if(recursive) {
-            await deleteFolderRecursive(path);
-        } else {
-            await unlink(path);
-        }
+        await rmdir(path, { recursive: !!recursive, force: true})
+
         res.send('ok')
     } catch(e) {
-        res.status(404).send('Directory does not exist.')
+        if(!!recursive)
+            res.status(404).send('Directory does not exist.')
+        else
+            res.status(403).send('Directory is not empty or does not exist. If not empty, use recursive option.')
     }
 });
 
