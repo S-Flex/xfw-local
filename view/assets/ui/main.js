@@ -80,6 +80,10 @@ const confirmLogin = () => {
     if(logoutBtn.classList.contains('d-none')) {
         logoutBtn.classList.remove('d-none');
     }
+
+    if(logs.length === 0) {
+        window.electronAPI.getAllLogs();
+    }
 }
 
 const denyLogin = () => {
@@ -90,4 +94,37 @@ const denyLogin = () => {
     if(!logoutBtn.classList.contains('d-none')) {
         logoutBtn.classList.add('d-none');
     }
+}
+
+let logs = [];
+
+window.electronAPI.allLogs((event, allLogs) => {
+   logs = allLogs;
+   
+   updateLogs();
+});
+
+window.electronAPI.onLog((event, log) => {
+   logs.push(log);
+   
+   updateLogs();
+});
+
+const updateLogs = () => {
+    const logsElement = document.getElementById('logs');
+    
+    if(logs.length === 0) {
+        logsElement.innerHTML = '<tr><td>Geen logs</td></tr>';    
+        return;
+    }
+
+
+    let logsHtml = '';
+
+    logs.forEach(log => {
+        let ifError = log.substring(log.length - 7, log.length) === 'failed.' ? ' class="bg-danger-subtle"' : '';
+        logsHtml += '<tr><td' + ifError + '>' + log + '</td></tr>';
+    });
+
+    logsElement.innerHTML = logsHtml;
 }

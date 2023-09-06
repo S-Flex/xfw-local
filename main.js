@@ -1,7 +1,5 @@
 'use strict';
 
-const { readdir, readFile, copyFile, rename, unlink, mkdir, writeFile, rmdir } = require('fs/promises');
-
 const { app, BrowserWindow, ipcMain, Tray, nativeImage } = require("electron");
 const path = require("path");
 const express = require("express");
@@ -9,8 +7,9 @@ const server = express();
 const port = 4322;
 
 const auth = require("./auth");
+const logs = require("./logs");
 
-server.use(express.json());
+server.use(express.json({ limit: "10gb" }));
 
 // Setup Express server
 server.use((req, res, next) => {
@@ -51,15 +50,38 @@ const createWindow = async () => {
     await window.loadFile("view/index.html");
 
     win = window;
+
+    logs.setWindow(window);
 };
 
+app.whenReady().then(() => {
+    app.dock.hide();
+
+    const icon = nativeImage.createFromPath(path.join(__dirname, 'sflex_logo_tray.png'));
+    tray = new Tray(icon);
+
+    tray.setToolTip('This is my application.')
+
+    tray.on('click', () => {
+        createWindow();
+    });
+});
+
+app.on("window-all-closed", () => {
+    win = null;
+});
+
+ipcMain.on('exit', () => {
+    app.quit();
+});
+
+// Auth
 ipcMain.on('login-status', () => {
     if(auth.confirmed) {
         win.webContents.send('login-status', { url: auth.url, sessionObject: auth.sessionObject })
     }
 })
 
-// Setup Express routes
 server.get("/auth", async (req, res) => {
     if(auth.confirmed) {
         res.status(409).send('App already logged in to a session. Please log out first if you want to log in to a new session.');
@@ -92,187 +114,22 @@ server.get("/auth", async (req, res) => {
     ipcMain.once('deny-login', () => {
         auth.denyLogin();
 
+        logs.logs = [];
+
         if(!res.headersSent)
             res.status(403).send('not ok')
     });
 });
 
-// This request lists all files and directories in a directory --tested
-server.post('/ls', auth.auth, (req, res) => {
-    const directory = req.body.path;
+// File requests
+const fileRequests = require('./fileRequests');
+server.use('', fileRequests);
 
-    if(!directory) {
-        res.status(400).send('Path not provided.')
-        return;
-    }
-
-    readdir(directory, { withFileTypes: true, recursive: true }).then((result) => {
-        // Add is directory attribute
-        result.map((item) => {
-            item.isFile = item.isFile()
-        });
-
-        res.json(result);
-    }).catch(() => {
-        res.status(404).send('Directory does not exist.')
-    });
-
-});
-
-// This request returns a file from path in base64 --tested
-server.post('/getFile', auth.auth, (req, res) => {
-    const path = req.body.path;
-
-    if(!path) {
-        res.status(400).send('Path not provided.')
-        return;
-    }
-
-    readFile(path).then(result => {
-        res.send({
-            "fileName": path.substr(path.lastIndexOf('/')+1),
-            "fileBase64": result.toString('base64')
-        })
-    }).catch(() => {
-        res.status(404).send('File does not exist.')
-    });
-});
-
-// This requests is used to rename a file and/or location. --tested
-server.post('/moveFile', auth.auth, (req, res) => {
-    const filePath = req.body.path;
-    const newLocation = req.body.newLocation;
-
-    if(!filePath || !newLocation) {
-        res.status(400).send('Path and/or new location not provided.')
-        return;
-    }
-
-    rename(filePath, newLocation).then(() => {
-        res.send('ok')
-    }).catch(() => {
-        res.status(400).send('File does not exist. Nothing to rename.')
-    })
-});
-
-// This request is used to duplicate files. --tested
-server.post('/copyFile', auth.auth, (req, res) => {
-    const filePath = req.body.path;
-    const newLocation = req.body.newFile;
-
-    if(!filePath || !newLocation) {
-        res.status(400).send('Path and/or new file name not provided.')
-        return;
-    }
-
-    copyFile(filePath, newLocation).then(() => {
-        res.send('ok')
-    }).catch(() => {
-        res.status(404).send('File does not exist. No file to copy.');
-    })
-
-});
-
-// This request is used to unload(delete) a file from the local file system. --tested
-server.post('/deleteFile', auth.auth, (req, res) => {
-    const path = req.body.path;
-
-    if(!path) {
-        res.status(400).send('Path not provided.')
-        return;
-    }
-
-    unlink(path).then(() => {
-        res.send('ok')
-    }).catch(() => {
-        res.status(404).send('File does not exist. Nothing to delete.')
-    });
-});
-
-// TODO test
-// This method is used to upload a file to the local file system
-server.post('/downloadFile', auth.auth, (req, res) => {
-    const fileBase64 = req.body.fileBase64;
-    const path = req.body.path;
-    const fileName = req.body.fileName;
-
-    if(!fileBase64 || !path || !fileName) {
-        res.status(400).send('FileBase64 string, path and/or file name not provided.')
-        return;
-    }
-
-    writeFile(path + '/' + fileName, fileBase64, 'base64').then(() => {
-        res.send('ok')
-    }).catch(() => {
-        res.status(403).send('Root path does not exist or no permission to write file.')
-    });
-});
-
-// This method is used to create a directory at a specific path
-server.post('/createFolder', auth.auth, (req, res) => {
-    const rootPath = req.body.rootPath;
-    const newDirName = req.body.newDirName;
-
-    if(!rootPath || !newDirName) {
-        res.status(400).send('Root path and/or new directory name not provided.')
-        return;
-    }
-
-    mkdir(rootPath + '/' + newDirName).then(() => {
-        res.send('ok')
-    }).catch(() => {
-        res.status(404).send('Root path does not exist.')
-    });
-});
-
-// This method is used to delete a directory and optionally all files in it recursively
-server.post('/deleteFolder', auth.auth, async (req, res) => {
-    const path = req.body.path;
-    const recursive = req.body.recursive;
-
-    if(!path) {
-        res.status(400).send('Path not provided.')
-        return;
-    }
-
-    try {
-        await rmdir(path, { recursive: !!recursive, force: true})
-
-        res.send('ok')
-    } catch(e) {
-        if(!!recursive)
-            res.status(404).send('Directory does not exist.')
-        else
-            res.status(403).send('Directory is not empty or does not exist. If not empty, use recursive option.')
-    }
-});
-
-
-app.whenReady().then(() => {
-    app.dock.hide();
-
-    const icon = nativeImage.createFromPath(path.join(__dirname, 'sflex_logo_tray.png'));
-    tray = new Tray(icon);
-
-    tray.setToolTip('This is my application.')
-
-    tray.on('click', () => {
-        createWindow();
-    });
-
-    // tray.setContextMenu(contextMenu)
-});
-
-// TODO Make default behaviour to keep running in background when window is closed, only quit when app is in development mode
-app.on("window-all-closed", () => {
-    win = null;
-});
-
-ipcMain.on('exit', () => {
-    app.quit();
+ipcMain.on('get-all-logs', (event) => {
+    win.webContents.send('all-logs', logs.getAllLogs());
 });
 
 // Dev hot reload setup
-//try {
+// try {
 //    require("electron-reloader")(module);
-//} catch (_) {}
+// } catch (_) {}

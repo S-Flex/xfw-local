@@ -8,7 +8,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     denyLogin: () => ipcRenderer.send('deny-login'),
     onLoginStatus: (handler) => ipcRenderer.on('login-status', handler),
     loginStatus: () => ipcRenderer.send('login-status'),
-    exit: () => ipcRenderer.send('exit')
+    exit: () => ipcRenderer.send('exit'),
+    onLog: (handler) => ipcRenderer.on('log', handler),
+    getAllLogs: () => ipcRenderer.send('get-all-logs'),
+    allLogs: (handler) => ipcRenderer.on('all-logs', handler),
 })
 
 contextBridge.exposeInMainWorld('ipcRenderer', ipcRenderer)
