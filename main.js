@@ -57,8 +57,7 @@ const createWindow = async () => {
 app.whenReady().then(() => {
     app.dock.hide();
 
-    const icon = nativeImage.createFromPath(path.join(__dirname, 'sflex_logo_tray.png'));
-    tray = new Tray(icon);
+    tray = new Tray(__dirname + '/icon/sflex_logo_tray.png');
 
     tray.setToolTip('This is my application.')
 
