@@ -45,7 +45,8 @@ const createWindow = async () => {
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true
-        }
+        },
+        menuBarVisible: false
     });
 
     await window.loadFile("view/index.html");
@@ -54,15 +55,18 @@ const createWindow = async () => {
 
     logs.setWindow(window);
 
-    app.dock.show();
+    if(app.dock && app.dock.show)
+        app.dock.show();
 
     win.once("closed", () => {
-        app.dock.hide();
+        if(app.dock && app.dock.hide)
+            app.dock.hide();
     });
 };
 
 app.whenReady().then(() => {
-    app.dock.hide();
+    if(app.dock && app.dock.hide)
+        app.dock.hide();
 
     tray = new Tray(__dirname + '/icon/sflex_logo_tray.png');
 
