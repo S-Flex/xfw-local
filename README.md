@@ -6,7 +6,6 @@ Deze applicatie maakt het mogelijk voor xfw-portal om lokaal op een pc opdrachte
 - Add launch on startup option
 - Look into application auto-update - https://www.electronjs.org/docs/latest/tutorial/updates
 - Make installer for mac and windows
-- Setup app icon
 
 ## Express Endpoints Documentation
 
@@ -14,7 +13,7 @@ Deze applicatie maakt het mogelijk voor xfw-portal om lokaal op een pc opdrachte
 This request is used to authenticate the app with a remote server.
 
 **Parameters:**
-- `url` (string): The URL of the remote server to authenticate with.
+- `url` (string): The URL of the Sign-spine website to authenticate with.
 - `token` (string): The authentication token to use.
 
 **Returns:**
@@ -110,3 +109,16 @@ This method is used to create a directory at a specific path.
 
 **Throws:**
 - `Error`: Throws an error if the specified directory already exists or the app does not have permission to create it.
+
+### POST /deleteFolder
+This method is used to delete a folder
+
+**parameters:**
+- `path` (string): The path of the directory to delete
+- `recursive` (boolean) optional parameter to enable recursive delete. Use in case when folder contains other folders and/or files.
+
+**Returns:**
+- `ok` (string): Returns "ok" if the directory is successfully deleted.
+
+**Throws:**
+- `Error`: Throws an error if the specified directory does not exist or in non recursive mode if the folder contains files and/or folders.
