@@ -1,31 +1,32 @@
 module.exports = {
   packagerConfig: {
     asar: true,
+    icon: './icon/sflex_logo'
   },
   rebuildConfig: {},
   makers: [
     {
-      name: '@electron-forge/maker-squirrel',
-      config: {},
-    },
-    {
       name: '@electron-forge/maker-zip',
-      platforms: ['darwin', 'win32'],
-      
+      platforms: ['darwin']
     },
     {
-      name: '@electron-forge/maker-deb',
-      config: {},
-    },
-    {
-      name: '@electron-forge/maker-rpm',
-      config: {},
-    },
+      name: '@electron-forge/maker-wix',
+      platforms: ['win32']
+    }
   ],
-  plugins: [
+  publishers: [
     {
-      name: '@electron-forge/plugin-auto-unpack-natives',
-      config: {},
-    },
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'S-Flex',
+          name: 'xfw-local'
+        },
+        prerelease: true
+      }
+    }
   ],
+  electronPackagerConfig: {
+    wine: 'wine'
+  }
 };
