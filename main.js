@@ -45,9 +45,10 @@ const createWindow = async () => {
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true
-        },
-        menuBarVisible: false
+        }
     });
+
+    window.menuBarVisible = false;
 
     await window.loadFile("view/index.html");
 
