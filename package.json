@@ -1,6 +1,6 @@
 {
   "name": "xfw-local",
-  "version": "0.1",
+  "version": "0.0.1",
   "description": "allows xfw-portal to perform local actions",
   "main": "main.js",
   "scripts": {
@@ -22,7 +22,7 @@
   "homepage": "https://github.com/S-Flex/xfw-local#readme",
   "devDependencies": {
     "@electron-forge/cli": "^6.4.2",
-    "@electron-forge/maker-wix": "^6.4.2",
+    "@electron-forge/maker-squirrel": "^6.4.2",
     "@electron-forge/maker-zip": "^6.4.2",
     "@electron-forge/plugin-auto-unpack-natives": "^6.4.2",
     "@electron-forge/publisher-github": "^6.4.2",

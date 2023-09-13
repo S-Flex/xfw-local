@@ -71,7 +71,7 @@ app.whenReady().then(() => {
 
     tray = new Tray(__dirname + '/icon/sflex_logo_tray.png');
 
-    tray.setToolTip('This is my application.')
+    tray.setToolTip('xfw-local')
 
     tray.on('click', () => {
         createWindow();

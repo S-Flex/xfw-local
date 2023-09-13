@@ -10,13 +10,23 @@ module.exports = {
       platforms: ['darwin']
     },
     {
-      name: '@electron-forge/maker-wix',
-      platforms: ['win32']
+      name: '@electron-forge/maker-squirrel',
+      platforms: ['win32'],
+      config: {
+        author: 'S-Flex',
+        description: 'Deze applicatie maakt het mogelijk om sign-spine websites lokale taken uit te voeren zoals bestanden aanmaken, verwijderen en verplaatsen.',
+      }
     }
+    // {
+    //   name: '@electron-forge/maker-wix',
+    //   platforms: ['win32']
+    // }
   ],
   publishers: [
     {
       name: '@electron-forge/publisher-github',
+      platforms: ['darwin', 'win32'],
+      arch: ['arm64', 'x64'],
       config: {
         repository: {
           owner: 'S-Flex',
