@@ -3,7 +3,7 @@ Deze applicatie maakt het mogelijk voor xfw-portal om lokaal op een pc opdrachte
 
 # TODO
 - Improve UI. Make it look like sign-spine css
-- Add launch on startup option
+- Add launch on startup option in UI
 - Look into application auto-update - https://www.electronjs.org/docs/latest/tutorial/updates
 - Make installer for mac and windows
 - Add remember me
