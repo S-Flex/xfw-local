@@ -13,6 +13,8 @@ module.exports = {
       name: '@electron-forge/maker-squirrel',
       platforms: ['win32'],
       config: {
+        title: 'xfw-local',
+        setupIcon: './icon/sflex_logo.ico',
         author: 'S-Flex',
         description: 'Deze applicatie maakt het mogelijk om sign-spine websites lokale taken uit te voeren zoals bestanden aanmaken, verwijderen en verplaatsen.',
       }
