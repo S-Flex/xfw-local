@@ -6,6 +6,7 @@ Deze applicatie maakt het mogelijk voor xfw-portal om lokaal op een pc opdrachte
 - Add launch on startup option
 - Look into application auto-update - https://www.electronjs.org/docs/latest/tutorial/updates
 - Make installer for mac and windows
+- Add remember 
 
 ## Express Endpoints Documentation
 
