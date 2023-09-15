@@ -3,11 +3,11 @@ Deze applicatie maakt het mogelijk voor xfw-portal om lokaal op een pc opdrachte
 
 # TODO
 - Improve UI. Make it look like sign-spine css
-- Add launch on startup option in UI
 - Look into application auto-update - https://www.electronjs.org/docs/latest/tutorial/updates
 - Make installer for mac and windows
 - Add remember me
-- Add CORS (maybe get domain list from database)
+- Store all logs on disc
+- when storage persist. Logout not removing session!
 
 ## Express Endpoints Documentation
 

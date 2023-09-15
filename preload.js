@@ -4,7 +4,7 @@ console.log(ipcRenderer)
 
 contextBridge.exposeInMainWorld('electronAPI', {
     onLogin: (handler) => ipcRenderer.on('login', handler),
-    confirmLogin: () => ipcRenderer.send('confirm-login'),
+    confirmLogin: (arg) => ipcRenderer.send('confirm-login', arg),
     denyLogin: () => ipcRenderer.send('deny-login'),
     onLoginStatus: (handler) => ipcRenderer.on('login-status', handler),
     loginStatus: () => ipcRenderer.send('login-status'),

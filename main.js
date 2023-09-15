@@ -15,6 +15,8 @@ const port = 4322;
 const auth = require("./auth");
 const logs = require("./logs");
 
+auth.loadCredentials();
+
 server.use(express.json({ limit: "10gb" }));
 server.use(cors({
     origin: (domain, callback) => {
@@ -201,14 +203,24 @@ server.get("/auth", async (req, res) => {
         return;
     }
 
-    ipcMain.once("confirm-login", () => {
+    console.log('bruh')
+
+    ipcMain.once("confirm-login", (e, arg) => {
+       
         auth.confirmLogin();
+
+        if(arg[0]) {
+            auth.storeCredentials();
+        } else {
+            auth.clearCredentials();
+        }
 
         if (!res.headersSent) res.send("ok");
     });
 
     ipcMain.once("deny-login", () => {
         auth.denyLogin();
+        auth.clearCredentials();
 
         logs.logs = [];
 

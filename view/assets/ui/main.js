@@ -16,6 +16,7 @@ let session = null;
     
     const init = () => {
         bodyHtmlLoad.innerHTML = readyBodyLoad;
+        console.log('init')
         window.electronAPI.loginStatus();
         
         bodyHtml = bodyHtmlLoad;
@@ -40,7 +41,7 @@ let session = null;
 
 window.electronAPI.onLoginStatus((event, loginObject) => {
     session = loginObject;
-    confirmLogin();
+    confirmLogin(true);
 });
 
 window.electronAPI.onLogin((event, loginObject) => {    
@@ -66,7 +67,9 @@ window.electronAPI.onLogin((event, loginObject) => {
 });
 
 
-const confirmLogin = () => {
+const confirmLogin = (automaticLogin = false) => {
+    window.electronAPI.confirmLogin([ document.getElementById('rememberMe')?.checked || automaticLogin ]);
+    
     bodyHtml.innerHTML = activeBody;
 
     const nameElement = document.getElementById('name');
@@ -74,8 +77,6 @@ const confirmLogin = () => {
 
     const websiteInput = document.getElementById('website');
     websiteInput.innerText = session.url;
-
-    window.electronAPI.confirmLogin();
     
     if(logoutBtn.classList.contains('d-none')) {
         logoutBtn.classList.remove('d-none');

@@ -1,5 +1,6 @@
 const { session } = require("electron");
-
+const homedir = require('os').homedir();
+const { writeFile, mkdir, unlink, readFile } = require("fs/promises");
 class authenticator {
 
     // Compare the token from the request with the local account token to make shure no other app can access the server
@@ -59,6 +60,7 @@ class authenticator {
 
             this.sessionObject = sessionObject;
             this.url = url;
+            this.confirmed = true;
 
             return true;
 
@@ -99,6 +101,78 @@ class authenticator {
 
     }
 
+    /**
+     * This method will store the credentials in the credentials.conf file
+     * 
+     * @param {string} token jwt of session
+     * @param {string} url source domain
+     */
+    static async storeCredentials() {
+        // check if folder exists
+        const storageLocation = getStorageLocation();
+
+        try {
+            await mkdir(storageLocation);
+        } catch(e) {
+            // folder already exists
+        }
+
+        try {
+            await writeFile(storageLocation + getFileName, this.localToken + '\n' + this.url, { flag: 'w' });
+        } catch(e) {
+            // file already exists
+        }
+    }
+
+    /**
+     * This method will load the credentials from the credentials.conf file
+     * 
+     * @returns {boolean} if successful code will return true
+     */
+    static async loadCredentials() {
+        const storageLocation = getStorageLocation();
+
+        try {
+            const credentials = await readFile(storageLocation + getFileName, 'utf-8');
+
+            const [
+                token,
+                url
+            ] = credentials.split('\n');
+
+            this.login(url, token);
+
+        } catch(e) {
+            return null;
+        }
+    }
+
+    /**
+     * Method to clear the credentials file
+     */
+    static async clearCredentials() {
+        const storageLocation = getStorageLocation();
+
+        try {
+            await unlink(storageLocation + getFileName);
+        } catch(e) {
+            // file does not exists
+        }
+    }
+
 }
+
+const getStorageLocation = () => {
+    switch(process.platform) {
+        case 'win32':
+            return homedir + '\\AppData\\Roaming\\xfw-local\\';
+        case 'darwin':
+            return homedir + '/Library/Application Support/xfw-local/';
+        case 'linux':
+            return homedir + '/.config/xfw-local/';
+    }
+}
+
+const getFileName = 'credentials.conf';
 
 module.exports = authenticator;
