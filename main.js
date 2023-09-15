@@ -5,6 +5,9 @@ const { app, BrowserWindow, ipcMain, Tray, nativeImage } = require("electron");
 if (require("electron-squirrel-startup")) return;
 
 const path = require("path");
+
+const cors = require("cors");
+
 const express = require("express");
 const server = express();
 const port = 4322;
@@ -13,6 +16,13 @@ const auth = require("./auth");
 const logs = require("./logs");
 
 server.use(express.json({ limit: "10gb" }));
+server.use(cors({
+    origin: (domain, callback) => {
+        callback(null, true);
+    },
+    credentials: true,
+    methods: ["GET", "POST"]
+}));
 
 if (handleSquirrelEvent()) {
     // squirrel event handled and app will exit in 1000ms, so don't do anything else
