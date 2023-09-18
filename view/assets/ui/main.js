@@ -27,7 +27,7 @@ let session = null;
         activeBody = activeBodyLoad;
 
         logoutBtn.addEventListener('click', () => {
-            denyLogin();
+            logout();
             bodyHtml.innerHTML = readyBody;
         });
 
@@ -91,6 +91,16 @@ const denyLogin = () => {
     bodyHtml.innerHTML = readyBody;
 
     window.electronAPI.denyLogin();
+
+    if(!logoutBtn.classList.contains('d-none')) {
+        logoutBtn.classList.add('d-none');
+    }
+}
+
+const logout = () => {
+    bodyHtml.innerHTML = readyBody;
+
+    window.electronAPI.logout();
 
     if(!logoutBtn.classList.contains('d-none')) {
         logoutBtn.classList.add('d-none');

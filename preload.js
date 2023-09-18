@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onLog: (handler) => ipcRenderer.on('log', handler),
     getAllLogs: () => ipcRenderer.send('get-all-logs'),
     allLogs: (handler) => ipcRenderer.on('all-logs', handler),
+    logout: () => ipcRenderer.send('logout')
 })
 
 contextBridge.exposeInMainWorld('ipcRenderer', ipcRenderer)

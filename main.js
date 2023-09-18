@@ -203,8 +203,6 @@ server.get("/auth", async (req, res) => {
         return;
     }
 
-    console.log('bruh')
-
     ipcMain.once("confirm-login", (e, arg) => {
        
         auth.confirmLogin();
@@ -220,13 +218,19 @@ server.get("/auth", async (req, res) => {
 
     ipcMain.once("deny-login", () => {
         auth.denyLogin();
-        auth.clearCredentials();
 
         logs.logs = [];
 
         if (!res.headersSent) res.status(403).send("not ok");
     });
 });
+
+ipcMain.on('logout', () => {
+    auth.clearCredentials();
+    auth.denyLogin();
+
+    logs.logs = [];
+})
 
 // File requests
 const fileRequests = require("./fileRequests");
