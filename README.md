@@ -124,3 +124,32 @@ This method is used to delete a folder
 
 **Throws:**
 - `Error`: Throws an error if the specified directory does not exist or in non recursive mode if the folder contains files and/or folders.
+
+### GET /getPrinters
+This method is used to get a list of all available printers and possible page sizes.
+
+**Returns**
+List of printers with possible page sizes
+```TypeScript
+interface printer {
+    name: string,
+    description: string,
+    status: string,
+    printerSizes: Array<{width: number, height: Number} | string>
+}
+```
+
+
+### POST /printFile
+This method is used to print a file to a specific (label) printer.
+
+**parameters:**
+- `path` (string): A Path to a .html file containing the file that needs to be printed.
+- `printerName` (string): The name of the printer that should be used. You can get the specific printer names from the /getPrinters request.
+- `pageSize` ({width: number, height: Number} | string): The name or specific size of the page that should be printed. Width and height might be able to be adjustable from the standard sizes depending on the type of printer. Some label printers are able to cut to a specific length for example.
+
+**Returns**
+- `ok` (string): Returns "ok" if the file print task has been send successfully
+
+**Throws:**
+- `Error`: Throws an error if some parameters are missing or some of the options have been filled with invalid options such as a wrong printer name or illegal page sizes.

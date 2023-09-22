@@ -1,3 +1,6 @@
+// Setup Electron.js
+const { BrowserWindow } = require("electron");
+
 // Setup express router
 const express = require('express');
 const router = express.Router();
@@ -5,6 +8,7 @@ const router = express.Router();
 // Local services import
 const auth = require("./auth");
 const logs = require("./logs");
+const { getPrinterSize } = require("./printerLogic");
 
 // Import file system
 const { readdir, readFile, copyFile, rename, unlink, mkdir, writeFile, rmdir } = require('fs/promises');
@@ -189,6 +193,77 @@ router.post('/deleteFolder', auth.auth, async (req, res) => {
             logs.addLog("Tried to delete directory on " + path + " but failed.");
         }
     }
+});
+
+// This method is used to print a file to a specific (label) printer.
+router.post('/printFile', auth.auth, (req, res) => {
+    const path = req.body.path;
+    const printerName = req.body.printerName;
+    const pageSize = req.body.pageSize;
+
+    if(!path || !printerName || !pageSize) {
+        res.status(400).send('Path, printer name and/or page size not provided.')
+        return;
+    }
+        
+    const window = new BrowserWindow({
+        icon: "./icon/sflex_logo.png",
+        webPreferences: {
+            nodeIntegration: true
+        }
+    });
+
+    const printOptions = {
+        silent: true,
+        deviceName: printerName,
+        pageSize: pageSize
+        // { width: 102000, height: 57380 }
+    };
+
+    window.loadFile(path)
+
+    window.webContents.on('did-frame-finish-load', () => {
+            
+        window.webContents.print(printOptions, (success) => {
+            if(success)
+                res.send('ok');
+            else
+                res.status(400).send('Printer is not available or does not exist.')
+            
+            window.destroy();
+        });
+
+    });
+});
+
+// This method is used to get a list of all available printers and possible page sizes.
+router.get('/getPrinters', auth.auth, async (req, res) => {
+
+    const window = new BrowserWindow({
+        icon: "./icon/sflex_logo.png",
+        height: 600,
+        width: 400,
+        webPreferences: {
+            nodeIntegration: true
+        }
+    });
+
+    window.webContents.getPrintersAsync().then(async (printers) => {
+        window.close();
+
+
+        const newPrinterList = printers.map(async (printer) => {
+            return {
+                name: printer.name,
+                description: printer.description,
+                status: printer.status,
+                printerSizes: await getPrinterSize(printer.name)
+            }
+        });
+
+        res.json(await Promise.all(newPrinterList));
+    });
+
 });
 
 //  export router
