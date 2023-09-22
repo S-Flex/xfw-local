@@ -6,9 +6,12 @@ const { exec } = require('child_process');
  * @returns {Promise<Array<{width: number, height: Number} | string>>}
  */
 function getPrinterSize(printerName) {
+    // Prevent string escapes with the printername
+    printerName = printerName.replaceAll('\\', '\\\\');
+
     return new Promise((resolve, reject) => {
         if (process.platform === "darwin" || process.platform === "linux") {
-            // macOS command to list paper sizes
+            // macOS and linux command to list paper sizes
             exec(
                 `lpoptions -p "${printerName}" -l | grep PageSize`,
                 (error, stdout, stderr) => {
@@ -24,19 +27,7 @@ function getPrinterSize(printerName) {
                                 const [x, y] = size.split('x');
                                 
                                 if(isNaN(x) || isNaN(y)) {
-                                    // if size name is one of the follwing string names, A0, A1, A2, A3, A4, A5, A6, Legal, Letter, Tabloid
-                                    if(
-                                        size === 'A0' || 
-                                        size === 'A1' || 
-                                        size === 'A2' || 
-                                        size === 'A3' || 
-                                        size === 'A4' || 
-                                        size === 'A5' || 
-                                        size === 'A6' || 
-                                        size === 'Legal' || 
-                                        size === 'Letter' || 
-                                        size === 'Tabloid'
-                                    )
+                                    if(filterSupportedSizes(size))
                                         return size;
                                     
                                     else return;
@@ -59,9 +50,25 @@ function getPrinterSize(printerName) {
                     } else {
                         const paperSizes = stdout
                             .trim()
-                            .split("=")[1]
+                            .split("={")[1]
+                            .replace('}', '')
+                            .replaceAll('"', '')
+                            .replaceAll('mm', '')
                             .split(",")
-                            .map((size) => size.trim());
+                            .map((size) => size.trim())
+                            .map((size) => {
+                                const [x, y] = size.split(' x ');
+
+                                if(isNaN(x) || isNaN(y))
+                                    if(filterSupportedSizes(size))
+                                        return size;
+                                    else 
+                                        return;
+                                else 
+                                    return { width: x*1000, height: y*1000 };
+                            })
+                            .filter((size) => size);
+
                         resolve(paperSizes);
                     }
                 }
@@ -70,6 +77,19 @@ function getPrinterSize(printerName) {
             reject(new Error(`Unsupported platform: ${process.platform}`));
         }
     });
+}
+
+function filterSupportedSizes(size) {
+    return  size === 'A0' || 
+            size === 'A1' || 
+            size === 'A2' || 
+            size === 'A3' || 
+            size === 'A4' || 
+            size === 'A5' || 
+            size === 'A6' || 
+            size === 'Legal' || 
+            size === 'Letter' || 
+            size === 'Tabloid';
 }
 
 module.exports = { 
