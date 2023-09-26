@@ -47,11 +47,10 @@ class Logs {
      * @param {{ date: Date, log: string }} log object that contains action and date
      */
     static async storeLog(log) {
-        console.log('storing log ' + JSON.stringify(log));
 
-        // check if folder exists
         const storageLocation = getStorageLocation();
 
+        // check if folder exists
         try {
             await mkdir(storageLocation);
         } catch(e) {
@@ -86,6 +85,32 @@ class Logs {
             // write file
             await writeFile(storageLocation + logFileName, JSON.stringify([log]), { flag: 'w' });
         }
+    }
+
+    /**
+     * This method will retrieve all logs that were stored in the log file.
+     * 
+     * @returns {Promise<{ date: Date, log: string }[]>} all logs that were stored in the log file
+     */
+    static async loadLogs() {
+
+        const storageLocation = getStorageLocation();
+
+        try {
+            readFile(storageLocation + logFileName, 'utf-8').then((logs) => {
+                const parsedLogs = JSON.parse(logs);
+
+                if(parsedLogs.length > 0)
+                    Logs.logs = parsedLogs.map((logObj) => logObj.log);
+
+            }).catch((e) => {
+                // file does not exists
+            });
+
+        } catch(e) {
+            // file does not exists
+        }
+
     }
 
 }

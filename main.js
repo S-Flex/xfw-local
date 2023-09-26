@@ -16,6 +16,7 @@ const auth = require("./auth");
 const logs = require("./logs");
 
 auth.loadCredentials();
+logs.loadLogs();
 
 server.use(express.json({ limit: "10gb" }));
 server.use(cors({
