@@ -225,10 +225,13 @@ router.post('/printFile', auth.auth, (req, res) => {
     window.webContents.on('did-frame-finish-load', () => {
             
         window.webContents.print(printOptions, (success) => {
-            if(success)
+            if(success) {
+                logs.addLog("Printed file on " + path + " to " + printerName + " with page size " + pageSize + ".")
                 res.send('ok');
-            else
+            } else {
+                logs.addLog("Tried to print file on " + path + " to " + printerName + " with page size " + pageSize + " but failed.")
                 res.status(400).send('Printer is not available or does not exist.')
+            }
             
             window.destroy();
         });
@@ -261,7 +264,15 @@ router.get('/getPrinters', auth.auth, async (req, res) => {
             }
         });
 
+        logs.addLog("Got printers list.")
         res.json(await Promise.all(newPrinterList));
+        
+    }).catch(() => {
+
+        window.close();
+        logs.addLog("Tried to get printers but failed.")
+        res.status(400).send('No printers available.')
+
     });
 
 });
