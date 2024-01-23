@@ -35,7 +35,7 @@ jobs:
         id: upload
         with:
           bucket: xfw-local
-          uploadKey: xfw-local.zip
+          file: xfw-local.zip
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
           contentType: text/plain; charset=UTF-8
