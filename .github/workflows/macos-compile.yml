@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Mac OS Compile
+name: Compile and Upload xfw-local release
 
 # Controls when the action will run.
 on:
@@ -14,7 +14,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build-and-deploy-master:
+  build-macos:
     # The type of runner that the job will run on
     runs-on: macos-13
     
@@ -22,12 +22,21 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4.1.1
-      - run: zip xfw-local.zip *
 
       # installing nodeJS
       - uses: actions/setup-node@v4.0.1
         with:
           node-version: 18
+
+      - run: |
+        npm install --force
+        npm run build-macos
+
+      # Compress output
+      - run: |
+        cd out
+        zip xfw-local-arm.zip -r xfw-local-darwin-arm64
+        zip xfw-local-x64.zip -r xfw-local-darwin-x64
       
       # Test upload
       - name: B2 Upload
@@ -35,7 +44,20 @@ jobs:
         id: upload
         with:
           bucket: xfw-local
-          file: xfw-local.zip
+          uploadKey: release
+          file: out/xfw-local-arm.zip
+          keyId: ${{ secrets.B2_KEY_ID }}
+          applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
+          contentType: text/plain; charset=UTF-8
+
+      # Test upload
+      - name: B2 Upload
+        uses: wilsonzlin/b2-upload-action@v1.0.1
+        id: upload
+        with:
+          bucket: xfw-local
+          uploadKey: release
+          file: out/xfw-local-x64.zip
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
           contentType: text/plain; charset=UTF-8
