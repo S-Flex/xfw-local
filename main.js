@@ -1,6 +1,6 @@
 "use strict";
 
-const { app, BrowserWindow, ipcMain, Tray, nativeImage } = require("electron");
+const { app, BrowserWindow, ipcMain, Tray, nativeImage, nativeTheme } = require("electron");
 
 if (require("electron-squirrel-startup")) return;
 
@@ -151,8 +151,15 @@ const createWindow = async () => {
 app.whenReady().then(() => {
     if (app.dock && app.dock.hide) app.dock.hide();
 
+    let path = "/icon/sflex_logo_trayTemplate.png"
+
+    // if os is windows and system theme is dark use light icons
+    if (process.platform === "win32" && nativeTheme.shouldUseDarkColors) {
+        path = "/icon/sflex_logo_tray_light.png"
+    }
+
     // Naam moet met template eindigen voor macos zodat macos automatisch de kleueren aanpast.
-    tray = new Tray(__dirname + "/icon/sflex_logo_trayTemplate.png");
+    tray = new Tray(__dirname + path);
 
     tray.setToolTip("xfw-local");
 
