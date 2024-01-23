@@ -103,7 +103,7 @@ jobs:
         with:
           bucket: xfw-local
           uploadKey: xfw-local-lastest-windows-x64.zip
-          file: out/xfw-local-windows-x64.zip
+          file: xfw-local-windows-x64.zip
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
           contentType: application/zip
@@ -114,7 +114,7 @@ jobs:
         with:
           bucket: xfw-local
           uploadKey: xfw-local-lastest-windows-arm.zip
-          file: out/xfw-local-windows-arm.zip
+          file: xfw-local-windows-arm.zip
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
           contentType: application/zip
