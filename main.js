@@ -151,7 +151,8 @@ const createWindow = async () => {
 app.whenReady().then(() => {
     if (app.dock && app.dock.hide) app.dock.hide();
 
-    tray = new Tray(__dirname + "/icon/sflex_logo_tray.png");
+    // Naam moet met template eindigen voor macos zodat macos automatisch de kleueren aanpast.
+    tray = new Tray(__dirname + "/icon/sflex_logo_trayTemplate.png");
 
     tray.setToolTip("xfw-local");
 
