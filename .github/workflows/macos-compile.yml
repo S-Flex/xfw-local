@@ -28,15 +28,17 @@ jobs:
         with:
           node-version: 18
 
-      - run: |
-        npm install --force
-        npm run build-macos
+      - name: Install dependencies and build
+        run: |
+          npm install --force
+          npm run build-macos
 
       # Compress output
-      - run: |
-        cd out
-        zip xfw-local-arm.zip -r xfw-local-darwin-arm64
-        zip xfw-local-x64.zip -r xfw-local-darwin-x64
+      - name: Compress output
+        run: |
+          cd out
+          zip xfw-local-arm.zip -r xfw-local-darwin-arm64
+          zip xfw-local-x64.zip -r xfw-local-darwin-x64
       
       # Test upload
       - name: B2 Upload
