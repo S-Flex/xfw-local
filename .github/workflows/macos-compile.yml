@@ -22,7 +22,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4.1.1
-        run: echo date > test.txt
+      - run: echo date > test.txt
 
       # installing nodeJS
       - uses: actions/setup-node@v4.0.1
