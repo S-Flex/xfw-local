@@ -31,26 +31,27 @@ jobs:
       - name: Install dependencies and build
         run: |
           npm install --force
-          npm run build-macos
+          npm run build-macos-x64
+        # npm run build-macos-universal
 
       # Compress output
       - name: Compress output
         run: |
           cd out
-          zip xfw-local-arm.zip -r xfw-local-darwin-arm64
           zip xfw-local-x64.zip -r xfw-local-darwin-x64
-      
+        # zip xfw-local-arm.zip -r xfw-local-darwin-arm64
+
       # Test upload
-      - name: B2 Upload ARM
-        uses: wilsonzlin/b2-upload-action@v1.0.1
-        id: upload-arm
-        with:
-          bucket: xfw-local
-          uploadKey: xfw-local-lastest-macos-arm.zip
-          file: out/xfw-local-arm.zip
-          keyId: ${{ secrets.B2_KEY_ID }}
-          applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
-          contentType: application/zip
+      # - name: B2 Upload ARM
+      #   uses: wilsonzlin/b2-upload-action@v1.0.1
+      #   id: upload-arm
+      #   with:
+      #     bucket: xfw-local
+      #     uploadKey: xfw-local-lastest-macos-arm.zip
+      #     file: out/xfw-local-arm.zip
+      #     keyId: ${{ secrets.B2_KEY_ID }}
+      #     applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
+      #     contentType: application/zip
 
       # Test upload
       - name: B2 Upload x64
@@ -60,6 +61,60 @@ jobs:
           bucket: xfw-local
           uploadKey: xfw-local-lastest-macos-x64.zip
           file: out/xfw-local-x64.zip
+          keyId: ${{ secrets.B2_KEY_ID }}
+          applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
+          contentType: application/zip
+  
+  build-windows:
+
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4.1.1
+      
+      - uses: actions/setup-node@v4.0.1
+        with:
+          node-version: 18
+
+      - name: Install dependencies and build
+        run: |
+          npm install --force
+          npm run build-windows
+
+      # Compress output
+      - name: Compress x64 output
+        uses: TheDoctor0/zip-release@0.7.6
+        with:
+          type: 'zip'
+          filename: 'xfw-local-windows-x64.zip'
+          folder: 'out/xfw-local-win32-x64'
+
+      - name: Compress arm output
+        uses: TheDoctor0/zip-release@0.7.6
+        with:
+          type: 'zip'
+          filename: 'xfw-local-windows-arm.zip'
+          folder: 'out/xfw-local-win32-arm'
+
+      # Test upload
+      - name: B2 Upload x64
+        uses: wilsonzlin/b2-upload-action@v1.0.1
+        id: upload-x64
+        with:
+          bucket: xfw-local
+          uploadKey: xfw-local-lastest-windows-x64.zip
+          file: out/xfw-local-windows-x64.zip
+          keyId: ${{ secrets.B2_KEY_ID }}
+          applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
+          contentType: application/zip
+
+      - name: B2 Upload arm
+        uses: wilsonzlin/b2-upload-action@v1.0.1
+        id: upload-arm
+        with:
+          bucket: xfw-local
+          uploadKey: xfw-local-lastest-windows-arm.zip
+          file: out/xfw-local-windows-arm.zip
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
           contentType: application/zip
