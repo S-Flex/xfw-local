@@ -45,21 +45,21 @@ jobs:
         uses: wilsonzlin/b2-upload-action@v1.0.1
         id: upload-arm
         with:
-          bucket: xfw-local
-          uploadKey: release
+          bucket: xfw-local ARM
+          uploadKey: xfw-local-lastest-macos-arm.zip
           file: out/xfw-local-arm.zip
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
-          contentType: text/plain; charset=UTF-8
+          contentType: application/zip
 
       # Test upload
-      - name: B2 Upload
+      - name: B2 Upload x64
         uses: wilsonzlin/b2-upload-action@v1.0.1
         id: upload-x64
         with:
           bucket: xfw-local
-          uploadKey: release
+          uploadKey: xfw-local-lastest-macos-x64.zip
           file: out/xfw-local-x64.zip
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
-          contentType: text/plain; charset=UTF-8
+          contentType: application/zip
