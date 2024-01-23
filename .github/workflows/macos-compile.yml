@@ -43,7 +43,7 @@ jobs:
       # Test upload
       - name: B2 Upload
         uses: wilsonzlin/b2-upload-action@v1.0.1
-        id: upload
+        id: upload-arm
         with:
           bucket: xfw-local
           uploadKey: release
@@ -55,7 +55,7 @@ jobs:
       # Test upload
       - name: B2 Upload
         uses: wilsonzlin/b2-upload-action@v1.0.1
-        id: upload
+        id: upload-x64
         with:
           bucket: xfw-local
           uploadKey: release
