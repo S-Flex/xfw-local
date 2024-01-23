@@ -22,7 +22,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4.1.1
-      - run: echo date > test.txt
+      - run: zip xfw-local.zip *
 
       # installing nodeJS
       - uses: actions/setup-node@v4.0.1
@@ -35,8 +35,7 @@ jobs:
         id: upload
         with:
           bucket: xfw-local
-          uploadKey: test
+          uploadKey: xfw-local.zip
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
-          file: test.txt
           contentType: text/plain; charset=UTF-8
