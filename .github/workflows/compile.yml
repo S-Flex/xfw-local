@@ -47,7 +47,7 @@ jobs:
       #   id: upload-arm
       #   with:
       #     bucket: xfw-local
-      #     uploadKey: xfw-local-lastest-macos-arm.zip
+      #     uploadKey: xfw-local-latest-macos-arm.zip
       #     file: out/xfw-local-arm.zip
       #     keyId: ${{ secrets.B2_KEY_ID }}
       #     applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
@@ -59,7 +59,7 @@ jobs:
         id: upload-x64
         with:
           bucket: xfw-local
-          uploadKey: xfw-local-lastest-macos-x64.zip
+          uploadKey: xfw-local-latest-macos-x64.zip
           file: out/xfw-local-x64.zip
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
@@ -81,20 +81,10 @@ jobs:
           npm install --force
           npm run build-windows
 
-      # Compress output
-      - name: Compress x64 output
-        uses: TheDoctor0/zip-release@0.7.6
-        with:
-          type: 'zip'
-          filename: 'xfw-local-windows-x64.zip'
-          path: 'out/xfw-local-win32-x64'
-
-      - name: Compress arm output
-        uses: TheDoctor0/zip-release@0.7.6
-        with:
-          type: 'zip'
-          filename: 'xfw-local-windows-arm.zip'
-          path: 'out/xfw-local-win32-arm'
+      - name: Compress output
+        run: |
+          tar.exe -a -c -f xfw-local-windows-x64.zip out/xfw-local-win32-x64
+          tar.exe -a -c -f xfw-local-windows-arm.zip out/xfw-local-win32-arm
 
       # Test upload
       - name: B2 Upload x64
@@ -102,8 +92,8 @@ jobs:
         id: upload-x64
         with:
           bucket: xfw-local
-          uploadKey: xfw-local-lastest-windows-x64.zip
-          file: out/xfw-local-windows-x64.zip
+          uploadKey: xfw-local-latest-windows-x64.zip
+          file: xfw-local-windows-x64.zip
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
           contentType: application/zip
@@ -113,8 +103,8 @@ jobs:
         id: upload-arm
         with:
           bucket: xfw-local
-          uploadKey: xfw-local-lastest-windows-arm.zip
-          file: out/xfw-local-windows-arm.zip
+          uploadKey: xfw-local-latest-windows-arm.zip
+          file: xfw-local-windows-arm.zip
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
           contentType: application/zip
