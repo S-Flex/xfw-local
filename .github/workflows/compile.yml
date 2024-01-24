@@ -81,10 +81,14 @@ jobs:
           npm install --force
           npm run build-windows
 
+      - run: dir
+      - run: dir out
+
       - name: Compress output
         run: |
-          tar.exe -a -c -f xfw-local-windows-x64.zip out/xfw-local-win32-x64
-          tar.exe -a -c -f xfw-local-windows-arm.zip out/xfw-local-win32-arm
+          cd out
+          tar.exe -a -c -f ../xfw-local-windows-x64.zip xfw-local-win32-x64
+          tar.exe -a -c -f ../xfw-local-windows-arm.zip xfw-local-win32-arm
 
       # Test upload
       - name: B2 Upload x64
