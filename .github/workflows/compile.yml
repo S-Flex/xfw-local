@@ -90,9 +90,9 @@ jobs:
           cd out
           dir
           tar.exe -a -c -f ../xfw-local-windows-x64.zip xfw-local-win32-x64
+          tar.exe -a -c -f ../xfw-local-windows-arm.zip xfw-local-win32-arm64
           cd ..
           dir
-        # tar.exe -a -c -f ../xfw-local-windows-arm.zip xfw-local-win32-arm
 
       # Test upload
       - name: B2 Upload x64
