@@ -87,8 +87,12 @@ jobs:
 
       - name: Compress output
         run: |
-          tar.exe -a -c -f xfw-local-windows-x64.zip D:\a\xfw-local\xfw-local\out\xfw-local-win32-x64
-          tar.exe -a -c -f xfw-local-windows-arm.zip D:\a\xfw-local\xfw-local\out\xfw-local-win32-arm
+          cd out
+          dir
+          tar.exe -a -c -f ../xfw-local-windows-x64.zip xfw-local-win32-x64
+          tar.exe -a -c -f ../xfw-local-windows-arm.zip xfw-local-win32-arm
+          cd ..
+          dir
 
       # Test upload
       - name: B2 Upload x64
