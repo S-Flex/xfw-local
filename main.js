@@ -150,7 +150,7 @@ const createWindow = async () => {
     win.on('show', () => {
         setTimeout(() => {
           win.focus();
-        }, 200);
+        }, 1000);
     });
 };
 

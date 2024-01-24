@@ -87,14 +87,14 @@ jobs:
         with:
           type: 'zip'
           filename: 'xfw-local-windows-x64.zip'
-          folder: 'out/xfw-local-win32-x64'
+          path: 'out/xfw-local-win32-x64'
 
       - name: Compress arm output
         uses: TheDoctor0/zip-release@0.7.6
         with:
           type: 'zip'
           filename: 'xfw-local-windows-arm.zip'
-          folder: 'out/xfw-local-win32-arm'
+          path: 'out/xfw-local-win32-arm'
 
       # Test upload
       - name: B2 Upload x64
@@ -103,7 +103,7 @@ jobs:
         with:
           bucket: xfw-local
           uploadKey: xfw-local-lastest-windows-x64.zip
-          file: xfw-local-windows-x64.zip
+          file: out/xfw-local-windows-x64.zip
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
           contentType: application/zip
@@ -114,7 +114,7 @@ jobs:
         with:
           bucket: xfw-local
           uploadKey: xfw-local-lastest-windows-arm.zip
-          file: xfw-local-windows-arm.zip
+          file: out/xfw-local-windows-arm.zip
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
           contentType: application/zip
