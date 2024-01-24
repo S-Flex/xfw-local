@@ -90,9 +90,9 @@ jobs:
           cd out
           dir
           tar.exe -a -c -f ../xfw-local-windows-x64.zip xfw-local-win32-x64
-          tar.exe -a -c -f ../xfw-local-windows-arm.zip xfw-local-win32-arm
           cd ..
           dir
+        # tar.exe -a -c -f ../xfw-local-windows-arm.zip xfw-local-win32-arm
 
       # Test upload
       - name: B2 Upload x64
@@ -106,13 +106,13 @@ jobs:
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
           contentType: application/zip
 
-      - name: B2 Upload arm
-        uses: wilsonzlin/b2-upload-action@v1.0.1
-        id: upload-arm
-        with:
-          bucket: xfw-local
-          uploadKey: xfw-local-latest-windows-arm.zip
-          file: xfw-local-windows-arm.zip
-          keyId: ${{ secrets.B2_KEY_ID }}
-          applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
-          contentType: application/zip
+      # - name: B2 Upload arm
+      #   uses: wilsonzlin/b2-upload-action@v1.0.1
+      #   id: upload-arm
+      #   with:
+      #     bucket: xfw-local
+      #     uploadKey: xfw-local-latest-windows-arm.zip
+      #     file: xfw-local-windows-arm.zip
+      #     keyId: ${{ secrets.B2_KEY_ID }}
+      #     applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
+      #     contentType: application/zip
