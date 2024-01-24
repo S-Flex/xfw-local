@@ -146,6 +146,12 @@ const createWindow = async () => {
     win.once("closed", () => {
         if (app.dock && app.dock.hide) app.dock.hide();
     });
+
+    win.on('show', () => {
+        setTimeout(() => {
+          win.focus();
+        }, 200);
+    });
 };
 
 app.whenReady().then(() => {
@@ -187,16 +193,17 @@ ipcMain.on("login-status", () => {
 });
 
 server.get("/auth", async (req, res) => {
-    if (auth.confirmed) {
-        res.status(409).send(
+    
+    // get http param url
+    const url = req.query.url;
+    const token = req.query.token;
+    
+    if (auth.confirmed && await auth.checkIfSameAccount(token)) {
+        res.status(200).send(
             "App already logged in to a session. Please log out first if you want to log in to a new session."
         );
         return;
     }
-
-    // get http param url
-    const url = req.query.url;
-    const token = req.query.token;
 
     try {
         await createWindow();

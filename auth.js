@@ -43,6 +43,32 @@ class authenticator {
         }
     }
 
+    /**
+     * This method allows for a quick check if the token is from the same account
+     * 
+     * @param {string} token jwt session token
+     * @returns boolean true if the token is from the same account
+     */
+    static async checkIfSameAccount(token) {
+
+        const checkToken = await fetch('https://xfw-hub.sflex.nl/api/OauthV2/info', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if(checkToken.status === 200) {
+            const sessionObject = await checkToken.json();
+
+            return sessionObject.contactId === this.sessionObject.contactId;
+        }
+
+        return false;
+
+    }
+
     static async login(url, token) {
 
         const checkToken = await fetch('https://xfw-hub.sflex.nl/api/OauthV2/info', {
