@@ -34,14 +34,11 @@ jobs:
           npm run build-macos-universal
         # npm run build-macos-x64
 
+      - run: ls -R out/make/zip/darwin/arm64/
+
       # Move files from build to out
       - name: Move compiled files
         run: |
-          ls -a out
-          ls -a out/make
-          ls -a out/make/zip
-          ls -a out/make/zip/darwin
-          ls -a out/make/zip/darwin/arm64
           mv out/make/zip/darwin/arm64/xfw-local-darwin-arm64-0.0.1.zip out/xfw-local-x64.zip
           mv out/make/zip/darwin/x64/xfw-local-darwin-arm64-0.0.1.zip out/xfw-local-arm.zip
 
