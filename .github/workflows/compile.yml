@@ -37,11 +37,11 @@ jobs:
       # Move files from build to out
       - name: Move compiled files
         run: |
-          ls out
-          ls out/make
-          ls out/make/zip
-          ls out/make/zip/darwin
-          ls out/make/zip/darwin/arm64
+          ls out -a
+          ls out/make -a
+          ls out/make/zip -a
+          ls out/make/zip/darwin -a
+          ls out/make/zip/darwin/arm64 -a
           mv out/make/zip/darwin/arm64/xfw-local-darwin-arm64-0.0.1.zip out/xfw-local-x64.zip
           mv out/make/zip/darwin/x64/xfw-local-darwin-arm64-0.0.1.zip out/xfw-local-arm.zip
 
@@ -88,12 +88,8 @@ jobs:
       # Move files from build to out
       - name: Move compiled files
         run: |
-          dir out
-          dir out\make
-          dir out\make\squirrel.windows
-          dir out\make\squirrel.windows\x64
-          move '.\out\make\squirrel.windows\x64\xfw-local-0.0.1 Setup.exe' .\out\xfw-local-windows-x64.exe
-          move '.\out\make\squirrel.windows\arm64\xfw-local-0.0.1 Setup.exe' .\out\xfw-local-windows-arm.exe
+          move '.\out\make\squirrel.windows\x64\xfw-local-0.0.1 Setup.exe' .\xfw-local-windows-x64.exe
+          move '.\out\make\squirrel.windows\arm64\xfw-local-0.0.1 Setup.exe' .\xfw-local-windows-arm.exe
 
       # Test upload
       - name: B2 Upload x64
