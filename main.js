@@ -207,7 +207,7 @@ app.whenReady().then(() => {
                         } else {
                             app.quit();
                         }
-                    });
+                    }).catch(() => app.quit());
                 }
             })
         })
