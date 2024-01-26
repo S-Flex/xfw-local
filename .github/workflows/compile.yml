@@ -16,7 +16,7 @@ jobs:
   # This workflow contains a single job called "build"
   build-macos:
     # The type of runner that the job will run on
-    runs-on: macos-12
+    runs-on: macos-13
     
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -27,6 +27,10 @@ jobs:
       - uses: actions/setup-node@v4.0.1
         with:
           node-version: 18
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
       - name: Read Version from File
         id: read-version
