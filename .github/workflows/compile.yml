@@ -34,13 +34,13 @@ jobs:
           npm run build-macos-universal
         # npm run build-macos-x64
 
-      - run: ls -R out/make/zip/darwin/arm64/
+      - run: ls out/make/zip/darwin/arm64/
 
       # Move files from build to out
       - name: Move compiled files
         run: |
-          mv out/make/zip/darwin/arm64/xfw-local-darwin-arm64-0.0.1.zip out/xfw-local-x64.zip
-          mv out/make/zip/darwin/x64/xfw-local-darwin-arm64-0.0.1.zip out/xfw-local-arm.zip
+          mv out/make/zip/darwin/arm64/xfw-local-darwin-arm64-0.0.1.zip xfw-local-x64.zip
+          mv out/make/zip/darwin/x64/xfw-local-darwin-arm64-0.0.1.zip xfw-local-arm.zip
 
       # Test upload
       - name: B2 Upload ARM
@@ -49,7 +49,7 @@ jobs:
         with:
           bucket: xfw-local
           uploadKey: xfw-local-latest-macos-arm.zip
-          file: out/xfw-local-arm.zip
+          file: xfw-local-arm.zip
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
           contentType: application/zip
@@ -61,7 +61,7 @@ jobs:
         with:
           bucket: xfw-local
           uploadKey: xfw-local-latest-macos-x64.zip
-          file: out/xfw-local-x64.zip
+          file: xfw-local-x64.zip
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
           contentType: application/zip
