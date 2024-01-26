@@ -72,7 +72,7 @@ jobs:
 
       - name: B2 Upload ARM
         uses: wilsonzlin/b2-upload-action@v1.0.1
-        id: upload-arm
+        id: upload-arm-with-version
         with:
           bucket: xfw-local
           uploadKey: xfw-local-${{ steps.read-version.outputs.version }}-macos-arm.zip
@@ -84,7 +84,7 @@ jobs:
       # Test upload
       - name: B2 Upload x64
         uses: wilsonzlin/b2-upload-action@v1.0.1
-        id: upload-x64
+        id: upload-x64-with-version
         with:
           bucket: xfw-local
           uploadKey: xfw-local-${{ steps.read-version.outputs.version }}-macos-x64.zip
@@ -146,7 +146,7 @@ jobs:
       # Test upload
       - name: B2 Upload x64
         uses: wilsonzlin/b2-upload-action@v1.0.1
-        id: upload-x64
+        id: upload-x64-with-version
         with:
           bucket: xfw-local
           uploadKey: xfw-local-${{ steps.read-version.outputs.version }}-windows-x64.exe
@@ -156,7 +156,7 @@ jobs:
 
       - name: B2 Upload arm
         uses: wilsonzlin/b2-upload-action@v1.0.1
-        id: upload-arm
+        id: upload-arm-with-version
         with:
           bucket: xfw-local
           uploadKey: xfw-local-${{ steps.read-version.outputs.version }}-windows-arm.exe
