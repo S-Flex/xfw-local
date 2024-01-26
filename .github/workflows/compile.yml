@@ -31,27 +31,26 @@ jobs:
       - name: Install dependencies and build
         run: |
           npm install --force
-          npm run build-macos-x64
-        # npm run build-macos-universal
+          npm run build-macos-universal
+        # npm run build-macos-x64
 
-      # Compress output
-      - name: Compress output
+      # Move files from build to out
+      - name: Move compiled files
         run: |
-          cd out
-          zip xfw-local-x64.zip -r xfw-local-darwin-x64
-        # zip xfw-local-arm.zip -r xfw-local-darwin-arm64
+          mv out/make/arm64/xfw-local-darwin-0.0.1.zip out/xfw-local-x64.zip
+          mv out/make/x64/xfw-local-darwin-0.0.1.zip out/xfw-local-arm.zip
 
       # Test upload
-      # - name: B2 Upload ARM
-      #   uses: wilsonzlin/b2-upload-action@v1.0.1
-      #   id: upload-arm
-      #   with:
-      #     bucket: xfw-local
-      #     uploadKey: xfw-local-latest-macos-arm.zip
-      #     file: out/xfw-local-arm.zip
-      #     keyId: ${{ secrets.B2_KEY_ID }}
-      #     applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
-      #     contentType: application/zip
+      - name: B2 Upload ARM
+        uses: wilsonzlin/b2-upload-action@v1.0.1
+        id: upload-arm
+        with:
+          bucket: xfw-local
+          uploadKey: xfw-local-latest-macos-arm.zip
+          file: out/xfw-local-arm.zip
+          keyId: ${{ secrets.B2_KEY_ID }}
+          applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
+          contentType: application/zip
 
       # Test upload
       - name: B2 Upload x64
@@ -81,12 +80,11 @@ jobs:
           npm install --force
           npm run build-windows
 
-      - name: Compress output
+      # Move files from build to out
+      - name: Move compiled files
         run: |
-          cd out
-          tar.exe -a -c -f ../xfw-local-windows-x64.zip xfw-local-win32-x64
-          tar.exe -a -c -f ../xfw-local-windows-arm.zip xfw-local-win32-arm64
-          cd ..
+          move "out/make/squirrel.windows/x64/xfw-local-0.0.1 Setup.exe" out/xfw-local-windows-x64.exe
+          move "out/make/squirrel.windows/arm64/xfw-local-0.0.1 Setup.exe" out/xfw-local-windows-arm.exe
 
       # Test upload
       - name: B2 Upload x64
@@ -94,19 +92,17 @@ jobs:
         id: upload-x64
         with:
           bucket: xfw-local
-          uploadKey: xfw-local-latest-windows-x64.zip
-          file: xfw-local-windows-x64.zip
+          uploadKey: xfw-local-latest-windows-x64.exe
+          file: xfw-local-windows-x64.exe
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
-          contentType: application/zip
 
       - name: B2 Upload arm
         uses: wilsonzlin/b2-upload-action@v1.0.1
         id: upload-arm
         with:
           bucket: xfw-local
-          uploadKey: xfw-local-latest-windows-arm.zip
-          file: xfw-local-windows-arm.zip
+          uploadKey: xfw-local-latest-windows-arm.exe
+          file: xfw-local-windows-arm.exe
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
-          contentType: application/zip
