@@ -6,7 +6,8 @@ name: Compile and Upload xfw-local release
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ main ]
+    tags:
+      - 'v*'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -28,13 +29,15 @@ jobs:
         with:
           node-version: 18
 
+      - name: Set version of software
+        run: echo "module.exports = \"$GITHUB_REF_NAME\";" > version.js
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+
       - name: Install dependencies and build
         run: |
           npm install --force
           npm run build-macos-universal
-        # npm run build-macos-x64
-
-      - run: ls out/make/zip/darwin/arm64/
 
       # Move files from build to out
       - name: Move compiled files
@@ -65,6 +68,29 @@ jobs:
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
           contentType: application/zip
+
+      - name: B2 Upload ARM
+        uses: wilsonzlin/b2-upload-action@v1.0.1
+        id: upload-arm
+        with:
+          bucket: xfw-local
+          uploadKey: xfw-local-${{ github.ref_name }}-macos-arm.zip
+          file: xfw-local-arm.zip
+          keyId: ${{ secrets.B2_KEY_ID }}
+          applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
+          contentType: application/zip
+
+      # Test upload
+      - name: B2 Upload x64
+        uses: wilsonzlin/b2-upload-action@v1.0.1
+        id: upload-x64
+        with:
+          bucket: xfw-local
+          uploadKey: xfw-local-${{ github.ref_name }}-macos-x64.zip
+          file: xfw-local-x64.zip
+          keyId: ${{ secrets.B2_KEY_ID }}
+          applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
+          contentType: application/zip
   
   build-windows:
 
@@ -76,6 +102,11 @@ jobs:
       - uses: actions/setup-node@v4.0.1
         with:
           node-version: 18
+
+      - name: Set version of software
+        run: echo "module.exports = \"$GITHUB_REF_NAME\";" > version.js
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
 
       - name: Install dependencies and build
         run: |
@@ -108,3 +139,25 @@ jobs:
           file: xfw-local-windows-arm.exe
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
+
+      # Test upload
+      - name: B2 Upload x64
+        uses: wilsonzlin/b2-upload-action@v1.0.1
+        id: upload-x64
+        with:
+          bucket: xfw-local
+          uploadKey: xfw-local-${{ github.ref_name }}-windows-x64.exe
+          file: xfw-local-windows-x64.exe
+          keyId: ${{ secrets.B2_KEY_ID }}
+          applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
+
+      - name: B2 Upload arm
+        uses: wilsonzlin/b2-upload-action@v1.0.1
+        id: upload-arm
+        with:
+          bucket: xfw-local
+          uploadKey: xfw-local-${{ github.ref_name }}-windows-arm.exe
+          file: xfw-local-windows-arm.exe
+          keyId: ${{ secrets.B2_KEY_ID }}
+          applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
+
