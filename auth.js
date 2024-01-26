@@ -86,7 +86,6 @@ class authenticator {
 
             this.sessionObject = sessionObject;
             this.url = url;
-            this.confirmed = true;
 
             return true;
 
