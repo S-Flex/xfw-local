@@ -204,6 +204,7 @@ app.whenReady().then(() => {
 
                         if(response.response == 0) {
                             require('electron').shell.openExternal('https://f003.backblazeb2.com/file/xfw-local/' + fileName);
+                            app.quit();
                         } else {
                             app.quit();
                         }
