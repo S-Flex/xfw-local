@@ -6,8 +6,10 @@ module.exports = {
   rebuildConfig: {},
   makers: [
     {
-      name: '@electron-forge/maker-zip',
-      platforms: ['darwin']
+      name: '@electron-forge/maker-dmg',
+      config: {
+        format: 'ULFO'
+      }
     },
     {
       name: '@electron-forge/maker-squirrel',
@@ -19,10 +21,6 @@ module.exports = {
         description: 'Deze applicatie maakt het mogelijk om sign-spine websites lokale taken uit te voeren zoals bestanden aanmaken, verwijderen en verplaatsen.',
       }
     }
-    // {
-    //   name: '@electron-forge/maker-wix',
-    //   platforms: ['win32']
-    // }
   ],
   publishers: [
     {

@@ -196,11 +196,9 @@ app.whenReady().then(() => {
                         normalizeAccessKeys: false
                     }).then((response) => {
                         const os = process.platform === 'darwin' ? 'macos' : 'windows';
+                        const arch = process.arch;
 
-                        // Voor nu wordt arm64 niet ondersteund op macos. Het zal om een of andere reden niet werken.
-                        const arch = os === 'macos' ? 'x64' : process.arch;
-
-                        const fileName = 'xfw-local-latest-' + os + '-' + arch + (os === 'macos' ? '.zip' : '.exe');
+                        const fileName = 'xfw-local-latest-' + os + '-' + arch + (os === 'macos' ? '.dmg' : '.exe');
 
                         if(response.response == 0) {
                             require('electron').shell.openExternal('https://f003.backblazeb2.com/file/xfw-local/' + fileName);

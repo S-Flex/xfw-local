@@ -43,8 +43,8 @@ jobs:
       # Move files from build to out
       - name: Move compiled files
         run: |
-          mv out/make/zip/darwin/arm64/*.zip xfw-local-x64.zip
-          mv out/make/zip/darwin/x64/*.zip xfw-local-arm.zip
+          mv out/make/*arm64.dmg xfw-local-x64.dmg
+          mv out/make/*x64.dmg xfw-local-arm.dmg
 
       # Test upload
       - name: B2 Upload ARM
@@ -52,11 +52,10 @@ jobs:
         id: upload-arm
         with:
           bucket: xfw-local
-          uploadKey: xfw-local-latest-macos-arm.zip
-          file: xfw-local-arm.zip
+          uploadKey: xfw-local-latest-macos-arm.dmg
+          file: xfw-local-arm.dmg
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
-          contentType: application/zip
 
       # Test upload
       - name: B2 Upload x64
@@ -64,22 +63,20 @@ jobs:
         id: upload-x64
         with:
           bucket: xfw-local
-          uploadKey: xfw-local-latest-macos-x64.zip
-          file: xfw-local-x64.zip
+          uploadKey: xfw-local-latest-macos-x64.dmg
+          file: xfw-local-x64.dmg
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
-          contentType: application/zip
 
       - name: B2 Upload ARM
         uses: wilsonzlin/b2-upload-action@v1.0.1
         id: upload-arm-with-version
         with:
           bucket: xfw-local
-          uploadKey: xfw-local-${{ steps.read-version.outputs.version }}-macos-arm.zip
-          file: xfw-local-arm.zip
+          uploadKey: xfw-local-${{ steps.read-version.outputs.version }}-macos-arm.dmg
+          file: xfw-local-arm.dmg
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
-          contentType: application/zip
 
       # Test upload
       - name: B2 Upload x64
@@ -87,11 +84,10 @@ jobs:
         id: upload-x64-with-version
         with:
           bucket: xfw-local
-          uploadKey: xfw-local-${{ steps.read-version.outputs.version }}-macos-x64.zip
-          file: xfw-local-x64.zip
+          uploadKey: xfw-local-${{ steps.read-version.outputs.version }}-macos-x64.dmg
+          file: xfw-local-x64.dmg
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
-          contentType: application/zip
   
   build-windows:
 
