@@ -39,8 +39,8 @@ jobs:
       # Move files from build to out
       - name: Move compiled files
         run: |
-          mv out/make/zip/darwin/arm64/xfw-local-darwin-arm64-0.0.1.zip xfw-local-x64.zip
-          mv out/make/zip/darwin/x64/xfw-local-darwin-arm64-0.0.1.zip xfw-local-arm.zip
+          mv out/make/zip/darwin/arm64/*.zip xfw-local-x64.zip
+          mv out/make/zip/darwin/x64/*.zip xfw-local-arm.zip
 
       # Test upload
       - name: B2 Upload ARM
