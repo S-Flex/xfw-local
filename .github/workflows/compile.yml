@@ -83,8 +83,8 @@ jobs:
       # Move files from build to out
       - name: Move compiled files
         run: |
-          move "out/make/squirrel.windows/x64/xfw-local-0.0.1 Setup.exe" out/xfw-local-windows-x64.exe
-          move "out/make/squirrel.windows/arm64/xfw-local-0.0.1 Setup.exe" out/xfw-local-windows-arm.exe
+          move '.\out\make\squirrel.windows\x64\xfw-local-0.0.1 Setup.exe' .\out\xfw-local-windows-x64.exe
+          move '.\out\make\squirrel.windows\arm64\xfw-local-0.0.1 Setup.exe' .\out\xfw-local-windows-arm.exe
 
       # Test upload
       - name: B2 Upload x64
