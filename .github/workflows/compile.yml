@@ -102,7 +102,7 @@ jobs:
           
       - name: Install dependencies and build
         run: |
-          npm install --force
+          npm ci --force
           npm run build-windows
 
       - name: Read Version from File
