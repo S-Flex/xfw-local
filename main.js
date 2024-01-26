@@ -1,6 +1,6 @@
 "use strict";
 
-const { app, BrowserWindow, ipcMain, Tray, nativeImage, nativeTheme } = require("electron");
+const { app, BrowserWindow, ipcMain, Tray, nativeImage, nativeTheme, dialog } = require("electron");
 
 if (require("electron-squirrel-startup")) return;
 
@@ -14,6 +14,8 @@ const port = 4322;
 
 const auth = require("./auth");
 const logs = require("./logs");
+
+const fs = require("fs").promises;
 
 auth.loadCredentials();
 logs.loadLogs();
@@ -171,6 +173,44 @@ app.whenReady().then(() => {
 
     tray.on("click", () => {
         createWindow();
+    });
+
+    // check if there is a new version available
+    const currentVersion = fs.readFile(__dirname + '/version.txt', 'utf-8');
+
+    currentVersion.then((version) => {
+        console.log('current version: ' + version)
+
+        fetch('https://node-red.sflex.nl/xfw-local-latest').then((response) => {
+            response.text().then((latestVersion) => {
+                if(version != latestVersion) {
+                    dialog.showMessageBox(win, {
+                        type: 'info',
+                        buttons: ['Downloaden', 'App afsluiten'],
+                        defaultId: 0,
+                        title: 'Xfw-local: Nieuwe versie beschikbaar, download alstublieft de laatste versie. Deze versie van de app wordt niet langer ondersteund.',
+                        message: 'Er is een nieuwe versie beschikbaar!',
+                        detail: 'Huidige versie: ' + version + ' Laatste versie: ' + latestVersion,
+                        cancelId: 1,
+                        noLink: false,
+                        normalizeAccessKeys: false
+                    }).then((response) => {
+                        const os = process.platform === 'darwin' ? 'macos' : 'windows';
+
+                        // Voor nu wordt arm64 niet ondersteund op macos. Het zal om een of andere reden niet werken.
+                        const arch = os === 'macos' ? 'x64' : process.arch;
+
+                        const fileName = 'xfw-local-latest-' + os + '-' + arch + (os === 'macos' ? '.zip' : '.exe');
+
+                        if(response.response == 0) {
+                            require('electron').shell.openExternal('https://f003.backblazeb2.com/file/xfw-local/' + fileName);
+                        } else {
+                            app.quit();
+                        }
+                    });
+                }
+            })
+        })
     });
 });
 
