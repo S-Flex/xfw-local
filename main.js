@@ -1,6 +1,6 @@
 "use strict";
 
-const { app, BrowserWindow, ipcMain, Tray, nativeImage, nativeTheme, dialog } = require("electron");
+const { app, BrowserWindow, ipcMain, Tray, nativeTheme, dialog, globalShortcut } = require("electron");
 
 if (require("electron-squirrel-startup")) return;
 
@@ -118,12 +118,15 @@ let tray = null;
 
 let win = null;
 
+const timeout = (time) => new Promise(resolve => setTimeout(resolve, time));
+
 // Setup Electron window
 const createWindow = async () => {
     if (win) {
         win.close();
+        await timeout(300);
     }
-
+    
     const window = new BrowserWindow({
         icon: "./icon/sflex_logo.png",
         height: 600,
@@ -150,10 +153,20 @@ const createWindow = async () => {
     });
 
     win.on('show', () => {
-        setTimeout(() => {
-          win.focus();
-        }, 1000);
+        let toFrontTries = 20;
+        const interval = setInterval(() => {
+
+            if (toFrontTries <= 0) {
+                clearInterval(interval);
+                return;
+            }
+
+            window.focus();
+            toFrontTries--;
+
+        }, 100);
     });
+    
 };
 
 app.whenReady().then(() => {
@@ -289,6 +302,7 @@ ipcMain.on('logout', () => {
 
 // File requests
 const fileRequests = require("./fileRequests");
+const { time } = require("console");
 server.use("", fileRequests);
 
 ipcMain.on("get-all-logs", (event) => {
@@ -315,3 +329,9 @@ app.setLoginItemSettings({
         '"--hidden"',
     ],
 });
+
+
+app.on('browser-window-focus', () => {
+    globalShortcut.unregister('F5');
+    globalShortcut.unregister('CommandOrControl+R');
+})
