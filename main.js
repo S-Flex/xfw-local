@@ -153,18 +153,12 @@ const createWindow = async () => {
     });
 
     win.on('show', () => {
-        let toFrontTries = 20;
-        const interval = setInterval(() => {
+        if (win.isMinimized())
+            win.restore();
 
-            if (toFrontTries <= 0) {
-                clearInterval(interval);
-                return;
-            }
-
-            window.focus();
-            toFrontTries--;
-
-        }, 100);
+        win.setAlwaysOnTop(true);
+        app.focus();
+        win.setAlwaysOnTop(false);
     });
     
 };
