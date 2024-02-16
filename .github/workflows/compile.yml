@@ -47,8 +47,8 @@ jobs:
       # Move files from build to out
       - name: Move compiled files
         run: |
-          mv out/make/*arm64.dmg xfw-local-x64.dmg
-          mv out/make/*x64.dmg xfw-local-arm.dmg
+          mv out/make/*x64.dmg xfw-local-x64.dmg
+          mv out/make/*arm64.dmg xfw-local-arm.dmg
 
       # Test upload
       - name: B2 Upload ARM
