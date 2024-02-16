@@ -127,24 +127,48 @@ router.post('/deleteFile', auth.auth, (req, res) => {
 
 // This method is used to upload a file to the local file system
 router.post('/downloadFile', auth.auth, (req, res) => {
-    const fileBase64 = req.body.fileBase64;
+    const fileBase64OrUrl = req.body.fileBase64OrUrl;
     const path = req.body.path;
     const fileName = req.body.fileName;
 
-    if(!fileBase64 || !path || !fileName) {
-        res.status(400).send('FileBase64 string, path and/or file name not provided.')
+    if(!fileBase64OrUrl || !path || !fileName) {
+        res.status(400).send('fileBase64OrUrl string, path and/or file name not provided.')
         return;
     }
 
-    writeFile(path + '/' + fileName, fileBase64, 'base64').then(() => {
-        res.send('ok')
-
-        logs.addLog("Uploaded file on " + path + '/' + fileName);
-    }).catch(() => {
-        logs.addLog("Tried to upload file on " + path + '/' + fileName + " but failed.");
+    if(fileBase64OrUrl.startsWith('http')) {
         
-        res.status(403).send('Root path does not exist or no permission to write file.')
-    });
+        fetch(fileBase64OrUrl)
+            .then((response) => response.arrayBuffer())
+            .then((response) => {
+                writeFile(path + '/' + fileName, Buffer.from(response)).then(() => {
+                    res.send('ok')
+            
+                    logs.addLog("Uploaded file on " + path + '/' + fileName);
+                }).catch(() => {
+                    logs.addLog("Tried to upload file on " + path + '/' + fileName + " but failed.");
+                    
+                    res.status(403).send('Root path does not exist or no permission to write file.')
+                });
+            })
+            .catch(() => {
+                logs.addLog("Tried to upload file on " + path + '/' + fileName + " but failed.");
+                
+                res.status(404).send('File does not exist or no permission to download file.')
+            });
+
+    } else {
+        writeFile(path + '/' + fileName, fileBase64OrUrl, 'base64').then(() => {
+            res.send('ok')
+    
+            logs.addLog("Uploaded file on " + path + '/' + fileName);
+        }).catch(() => {
+            logs.addLog("Tried to upload file on " + path + '/' + fileName + " but failed.");
+            
+            res.status(403).send('Root path does not exist or no permission to write file.')
+        });
+    }
+
 });
 
 // This method is used to create a directory at a specific path

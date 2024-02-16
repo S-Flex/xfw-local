@@ -86,7 +86,7 @@ This request is used to unload(delete) a file from the local file system.
 This method is used to upload a file to the local file system.
 
 **Parameters:**
-- `fileBase64` (string): The base64-encoded contents of the file to upload.
+- `fileBase64OrUrl` (string): The base64-encoded contents of the file to upload or url path to download file.
 - `path` (string): The path of the directory to upload the file to.
 - `fileName` (string): The name of the file to upload.
 
