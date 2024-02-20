@@ -1,7 +1,8 @@
 module.exports = {
   packagerConfig: {
     asar: true,
-    icon: './icon/sflex_logo'
+    icon: './icon/sflex_logo',
+    extraResource: ['./ghostScript'],
   },
   rebuildConfig: {},
   makers: [
