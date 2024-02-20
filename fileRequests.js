@@ -288,6 +288,8 @@ router.post('/printFile', auth.auth, (req, res) => {
 
         const completeCommand = `"${ghostScriptExecutablePath}" ${standardOptions} ${pageSizeOption} ${printerOption} "${path}"`;
 
+        console.log(completeCommand)
+
         exec(completeCommand, (error, stdout, stderr) => {
             if (error || stderr) {
                 logs.addLog(`Tried to print file on ${path} to ${printerName} with page size ${pageSize} but failed.`);

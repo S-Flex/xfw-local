@@ -120,7 +120,6 @@ jobs:
       - name: Move compiled files
         run: |
           move '.\out\make\squirrel.windows\x64\xfw-local-0.0.1 Setup.exe' .\xfw-local-windows-x64.exe
-          move '.\out\make\squirrel.windows\arm64\xfw-local-0.0.1 Setup.exe' .\xfw-local-windows-arm.exe
 
       # Test upload
       - name: B2 Upload x64
@@ -130,16 +129,6 @@ jobs:
           bucket: xfw-local
           uploadKey: xfw-local-latest-windows-x64.exe
           file: xfw-local-windows-x64.exe
-          keyId: ${{ secrets.B2_KEY_ID }}
-          applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
-
-      - name: B2 Upload arm
-        uses: wilsonzlin/b2-upload-action@v1.0.1
-        id: upload-arm
-        with:
-          bucket: xfw-local
-          uploadKey: xfw-local-latest-windows-arm.exe
-          file: xfw-local-windows-arm.exe
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
 
@@ -153,14 +142,3 @@ jobs:
           file: xfw-local-windows-x64.exe
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
-
-      - name: B2 Upload arm
-        uses: wilsonzlin/b2-upload-action@v1.0.1
-        id: upload-arm-with-version
-        with:
-          bucket: xfw-local
-          uploadKey: xfw-local-${{ steps.read-version.outputs.version }}-windows-arm.exe
-          file: xfw-local-windows-arm.exe
-          keyId: ${{ secrets.B2_KEY_ID }}
-          applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
-
