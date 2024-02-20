@@ -3,7 +3,6 @@ Deze applicatie maakt het mogelijk voor xfw-portal om lokaal op een pc opdrachte
 
 # TODO
 - Improve UI. Make it look like sign-spine css
-- Look into application auto-update - https://www.electronjs.org/docs/latest/tutorial/updates
 
 ## Express Endpoints Documentation
 
@@ -43,6 +42,18 @@ This request returns a file from path in base64.
 
 **Throws:**
 - `Error`: Throws an error if the specified file does not exist.
+
+### POST /openFile
+Opens a file in the default application for the file type.
+
+**Parameters:**
+- `path` (string): The path of the file to open.
+
+**Returns:**
+- `ok` (string): Returns "ok" if the file is successfully opened.
+
+**Throws:**
+- `Error`: Throws an error if the specified file does not exist or failed opening file.
 
 ### POST /moveFile
 This request is used to rename a file and/or location.

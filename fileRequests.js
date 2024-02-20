@@ -12,6 +12,8 @@ const { getPrinterSize } = require("./printerLogic");
 
 // Import file system
 const { readdir, readFile, copyFile, rename, unlink, mkdir, writeFile, rmdir } = require('fs/promises');
+const pathTools = require('path');
+const { exec } = require('child_process');
 
 // This request lists all files and directories in a directory
 router.post('/ls', auth.auth, (req, res) => {
@@ -59,6 +61,46 @@ router.post('/getFile', auth.auth, (req, res) => {
         res.status(404).send('File does not exist.')
 
         logs.addLog("Tried to create file on " + path + " but failed.");
+    });
+});
+
+// Open file in default application
+router.post('/openFile', auth.auth, (req, res) => {
+    const path = req.body.path;
+
+    if(!path) {
+        res.status(400).send('Path not provided.')
+        return;
+    }
+
+    const resolvedPath = pathTools.resolve(path);
+
+    // Platform-specific command to open the file with the default application
+    let command;
+    switch (process.platform) {
+        case 'darwin': // macOS
+            command = `open "${resolvedPath}"`;
+            break;
+        case 'win32': // Windows
+            command = `start "" "${resolvedPath}"`;
+            break;
+        case 'linux': // Linux
+            command = `xdg-open "${resolvedPath}"`;
+            break;
+        default:
+            console.error('Unsupported platform');
+            return;
+    }
+
+    // Execute the command to open the file
+    exec(command, (error, stdout, stderr) => {
+        if (error || stderr) {
+            logs.addLog("Tried to open file on " + path + " but failed.");
+            res.status(500).send(`Error opening file: ${error.message || stderr}`);
+            return;
+        }
+        logs.addLog("Opened file on " + path);
+        res.send('ok');
     });
 });
 
