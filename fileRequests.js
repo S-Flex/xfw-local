@@ -267,42 +267,53 @@ router.post('/printFile', auth.auth, (req, res) => {
     const printerName = req.body.printerName;
     const pageSize = req.body.pageSize;
 
-    if(!path || !printerName || !pageSize) {
-        res.status(400).send('Path, printer name and/or page size not provided.')
+    if (!path || !printerName || !pageSize) {
+        res.status(400).send('Path, printer name and/or page size not provided.');
         return;
     }
-        
-    const window = new BrowserWindow({
-        icon: "./icon/sflex_logo.png",
-        webPreferences: {
-            nodeIntegration: true
+
+    if (process.platform === 'win32') {
+        // windows
+
+        const ghostScriptExecutablePath = __dirname + "/ghostScript/gswin64.exe";
+        const standardOptions = "-dQUIET -dNOPAUSE -dNOSAFER -q -sDEVICE=mswinpr2";
+        const printerOption = `-sOutputFile="%printer%${printerName}"`;
+
+        let pageSizeOption;
+        if (typeof pageSize === 'string') {
+            pageSizeOption = `-sPAPERSIZE=${pageSize}`;
+        } else {
+            pageSizeOption = `-dDEVICEWIDTHPOINTS=${pageSize.width} -dDEVICEHEIGHTPOINTS=${pageSize.height}`;
         }
-    });
 
-    const printOptions = {
-        silent: true,
-        deviceName: printerName,
-        pageSize: pageSize
-        // { width: 102000, height: 57380 }
-    };
+        const completeCommand = `"${ghostScriptExecutablePath}" ${standardOptions} ${pageSizeOption} ${printerOption} "${path}"`;
 
-    window.loadFile(path)
-
-    window.webContents.on('did-frame-finish-load', () => {
-            
-        window.webContents.print(printOptions, (success) => {
-            if(success) {
-                logs.addLog("Printed file on " + path + " to " + printerName + " with page size " + pageSize + ".")
-                res.send('ok');
-            } else {
-                logs.addLog("Tried to print file on " + path + " to " + printerName + " with page size " + pageSize + " but failed.")
-                res.status(400).send('Printer is not available or does not exist.')
+        exec(completeCommand, (error, stdout, stderr) => {
+            if (error || stderr) {
+                logs.addLog(`Tried to print file on ${path} to ${printerName} with page size ${pageSize} but failed.`);
+                res.status(400).send(`Error printing file: ${error ? error.message : stderr}`);
+                return;
             }
-            
-            window.destroy();
-        });
 
-    });
+            logs.addLog(`Printed file on ${path} to ${printerName} with page size ${pageSize}.`);
+            res.send('ok');
+        });
+    } else {
+        // linux and mac
+
+        const printSize = typeof pageSize === 'string' ? pageSize : `${pageSize.width}x${pageSize.height}mm`;
+
+        exec (`lp -d ${printerName} -o media=${printSize} ${path}`, (error, stdout, stderr) => {
+            if (error || stderr) {
+                logs.addLog("Tried to print file on " + path + " to " + printerName + " with page size " + pageSize + " but failed.")
+                res.status(400).send(`Error printing file: ${error.message || stderr}`);
+                return;
+            }
+
+            logs.addLog("Printed file on " + path + " to " + printerName + " with page size " + pageSize + ".")
+            res.send('ok');
+        });
+    }
 });
 
 // This method is used to get a list of all available printers and possible page sizes.
