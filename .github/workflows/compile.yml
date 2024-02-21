@@ -48,7 +48,7 @@ jobs:
       - name: Move compiled files
         run: |
           mv out/make/*x64.dmg xfw-local-x64.dmg
-          mv out/make/*arm64.dmg xfw-local-arm.dmg
+          mv out/make/*arm64.dmg xfw-local-arm64.dmg
 
       # Test upload
       - name: B2 Upload ARM
@@ -56,8 +56,8 @@ jobs:
         id: upload-arm
         with:
           bucket: xfw-local
-          uploadKey: xfw-local-latest-macos-arm.dmg
-          file: xfw-local-arm.dmg
+          uploadKey: xfw-local-latest-macos-arm64.dmg
+          file: xfw-local-arm64.dmg
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
 
@@ -77,8 +77,8 @@ jobs:
         id: upload-arm-with-version
         with:
           bucket: xfw-local
-          uploadKey: xfw-local-${{ steps.read-version.outputs.version }}-macos-arm.dmg
-          file: xfw-local-arm.dmg
+          uploadKey: xfw-local-${{ steps.read-version.outputs.version }}-macos-arm64.dmg
+          file: xfw-local-arm64.dmg
           keyId: ${{ secrets.B2_KEY_ID }}
           applicationKey: ${{ secrets.B2_APPLICATION_KEY }}
 

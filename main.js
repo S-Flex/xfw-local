@@ -1,6 +1,6 @@
 "use strict";
 
-const { app, BrowserWindow, ipcMain, Tray, nativeTheme, dialog, globalShortcut } = require("electron");
+const { app, BrowserWindow, ipcMain, Tray, nativeTheme, dialog, globalShortcut, shell } = require("electron");
 
 if (require("electron-squirrel-startup")) return;
 
@@ -208,8 +208,8 @@ app.whenReady().then(() => {
                         const fileName = 'xfw-local-latest-' + os + '-' + arch + (os === 'macos' ? '.dmg' : '.exe');
 
                         if(response.response == 0) {
-                            require('electron').shell.openExternal('https://f003.backblazeb2.com/file/xfw-local/' + fileName);
-                            app.quit();
+                            shell.openExternal('https://f003.backblazeb2.com/file/xfw-local/' + fileName);
+                            setTimeout(() => app.quit(), 500);
                         } else {
                             app.quit();
                         }
