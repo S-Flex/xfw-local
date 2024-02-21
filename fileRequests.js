@@ -275,8 +275,15 @@ router.post('/printFile', auth.auth, (req, res) => {
     if (process.platform === 'win32') {
         // windows
 
-        const ghostScriptExecutablePath = __dirname + "/ghostScript/gswin64.exe";
-        const standardOptions = "-dQUIET -dNOPAUSE -dNOSAFER -q -sDEVICE=mswinpr2";
+        let ghostScriptExecutablePath;
+
+        if(process.resourcesPath.indexOf('AppData') !== -1)
+            ghostScriptExecutablePath = process.resourcesPath; // this path is for installed builds
+        else 
+            ghostScriptExecutablePath = __dirname; // this path is for development enviroment
+
+        ghostScriptExecutablePath = ghostScriptExecutablePath + "/ghostScript/gswin64.exe";
+        const standardOptions = "-dBATCH -dNOPROMPT -dNOPAUSE -dNOSAFER -q -sDEVICE=mswinpr2";
         const printerOption = `-sOutputFile="%printer%${printerName}"`;
 
         let pageSizeOption;
@@ -287,8 +294,6 @@ router.post('/printFile', auth.auth, (req, res) => {
         }
 
         const completeCommand = `"${ghostScriptExecutablePath}" ${standardOptions} ${pageSizeOption} ${printerOption} "${path}"`;
-
-        console.log(completeCommand)
 
         exec(completeCommand, (error, stdout, stderr) => {
             if (error || stderr) {
