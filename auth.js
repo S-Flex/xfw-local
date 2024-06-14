@@ -62,7 +62,7 @@ class authenticator {
         if(checkToken.status === 200) {
             const sessionObject = await checkToken.json();
 
-            return sessionObject.contactId === this.sessionObject.contactId;
+            return sessionObject.contactId == this.sessionObject.contactId;
         }
 
         return false;
